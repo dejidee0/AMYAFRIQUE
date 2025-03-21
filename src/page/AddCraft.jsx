@@ -1,238 +1,234 @@
-// import { useContext } from "react";
-// import { AuthContext } from "../provider/AuthProvider";
+import { useState } from "react";
 import Swal from "sweetalert2";
-
+import supabase from "../../supabase-client";
 const AddCraft = () => {
-  // const {user}= useContext(AuthContext)
+  const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
-  const handleAdd = (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const item_name = form.itemName.value;
-    const subcategory_name = form.subName.value;
-    const rating = form.rating.value;
-    const short_description = form.shortDes.value;
-    const price = form.price.value;
-    const customization = form.cust.value;
-    const processing_time = form.process.value;
-    const stockStatus = form.status.value;
-    const email = form.email.value;
-    const name = form.name.value;
-    const image = form.photoUrl.value;
-    const newArt = {
-      item_name,
-      subcategory_name,
-      rating,
-      short_description,
-      price,
-      customization,
-      processing_time,
-      stockStatus,
-      email,
-      name,
-      image,
-    };
-    console.log(newArt);
+  // Handle File Selection
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    fetch("https://assignment-10-server-nu-ashen.vercel.app/arts", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(newArt),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        form.reset();
-        if (data.insertedId) {
-          Swal.fire({
-            text: "Added item successfully",
-            icon: "success",
-            confirmButtonText: "Ok",
-          });
-        }
-      });
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file)); // Show preview before upload
   };
+
+  // Handle Form Submission
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const form = e.target;
+    const title = form.title.value;
+    const description = form.description.value;
+    const category = form.category.value;
+    const artist = form.artist.value;
+    const year = form.year.value;
+
+    // Ensure an image is selected
+    if (!imageFile) {
+      Swal.fire({
+        text: "Please select an image",
+        icon: "warning",
+        confirmButtonText: "Ok",
+      });
+      setLoading(false);
+      return;
+    }
+
+    let imageUrl = "";
+    try {
+      const fileName = `${Date.now()}-${imageFile.name}`;
+      const { error } = await supabase.storage
+        .from("art-images")
+        .upload(fileName, imageFile, {
+          cacheControl: "3600",
+          upsert: false, // Prevent overwriting existing files
+          contentType: imageFile.type, // Ensure correct file type
+        });
+
+      if (error) throw error;
+
+      // Get Public URL
+      const { data: imageData } = supabase.storage
+        .from("art-images")
+        .getPublicUrl(fileName);
+      imageUrl = imageData.publicUrl;
+    } catch (error) {
+      Swal.fire({
+        text: "Image upload failed",
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
+      console.error(error);
+      setLoading(false);
+      return;
+    }
+
+    const newArt = {
+      title,
+      description,
+      category,
+      image: imageUrl,
+      artist,
+      year,
+    };
+
+    // Insert into Supabase
+    const { error } = await supabase.from("ArtList").insert([newArt]);
+
+    if (error) {
+      Swal.fire({
+        text: "Failed to add item",
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
+      console.error(error);
+    } else {
+      Swal.fire({
+        text: "Added item successfully",
+        icon: "success",
+        confirmButtonText: "Ok",
+      });
+      form.reset();
+      setImageFile(null);
+      setImagePreview(null);
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div>
-      <div className="">
-        <div className="hero-content flex-col lg:flex-row-reverse">
-          <div className="text-center lg:text-left"></div>
-          <div className="card shrink-0 w-full shadow-2xl bg-base-100 border-2 border-[#eb9b40]">
-            <form onSubmit={handleAdd} className="card-body">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 ">
-                {/* 1 */}
-                <div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">
-                        Item_Name
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Item_name"
-                      name="itemName"
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">Rating</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="rating"
-                      name="rating"
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">
-                        Short Description
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="short description"
-                      name="shortDes"
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">Price</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="price"
-                      name="price"
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control">
-                    <p className="label-text font-semibold mt-2 ">
-                      Subcategory Name
-                    </p>
-                    <label className="label">
-                      <select name="subName" className="border-2 " required>
-                        <option value=""></option>
-                        <option value="Landscape Painting">
-                          Landscape Painting
-                        </option>
-                        <option value="Portrait Drawing">
-                          Portrait Drawing
-                        </option>
-                        <option value="Watercolor Painting">
-                          Watercolor Painting
-                        </option>
-                        <option value="Oil Painting">Oil Painting</option>
-                        <option value="Charcoal Sketching">
-                          Charcoal Sketching
-                        </option>
-                        <option value="Cartoon Drawing">Cartoon Drawing</option>
-                      </select>
-                    </label>
-                  </div>
+      <div className="hero-content flex-col lg:flex-row-reverse">
+        <div className="card shrink-0 w-full shadow-2xl bg-base-100 border-2 border-[#eb9b40]">
+          <form onSubmit={handleAdd} className="card-body">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Left Side */}
+              <div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Title</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    placeholder="Title"
+                    className="input input-bordered"
+                    required
+                  />
                 </div>
-                {/* 2 */}
-                <div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">
-                        Processing_time
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="processing_time"
-                      name="process"
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
 
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">
-                        User Email
-                      </span>
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="email"
-                      name="email"
-                      // defaultValue={user.email}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">
-                        User Name
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="name"
-                      name="name"
-                      // defaultValue={user.displayName}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control">
-                    <p className="label-text font-semibold mt-2 ">
-                      Customization
-                    </p>
-                    <label className="label">
-                      <select name="cust" className="border-2 " required>
-                        <option value=""></option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                      </select>
-                    </label>
-                  </div>
-                  <div className="form-control">
-                    <p className="label-text font-semibold mt-2 ">
-                      Stock Status
-                    </p>
-                    <label className="label">
-                      <select name="status" className="border-2 " required>
-                        <option value=""></option>
-                        <option value="In stock">In stock</option>
-                        <option value="Made to Order">Made to Order</option>
-                      </select>
-                    </label>
-                  </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">
+                      Description
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    name="description"
+                    placeholder="Description"
+                    className="input input-bordered"
+                    required
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Category</span>
+                  </label>
+                  <select
+                    name="category"
+                    className="border-2 input-bordered w-full p-2"
+                    required
+                  >
+                    <option value=""></option>
+                    <option value="Landscape Painting">
+                      Landscape Painting
+                    </option>
+                    <option value="Portrait Drawing">Portrait Drawing</option>
+                    <option value="Watercolor Painting">
+                      Watercolor Painting
+                    </option>
+                    <option value="Oil Painting">Oil Painting</option>
+                    <option value="Charcoal Sketching">
+                      Charcoal Sketching
+                    </option>
+                    <option value="Cartoon Drawing">Cartoon Drawing</option>
+                  </select>
                 </div>
               </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Image</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="photoUrl"
-                  name="photoUrl"
-                  className="input input-bordered"
-                  required
-                />
-              </div>
 
-              <div className="form-control mt-6">
-                <button className="btn bg-purple-500 text-black">Add</button>
+              {/* Right Side */}
+              <div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Artist</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="artist"
+                    placeholder="Artist"
+                    className="input input-bordered"
+                    required
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Year</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="year"
+                    placeholder="Year"
+                    className="input input-bordered"
+                    required
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">
+                      Upload Image
+                    </span>
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="file-input file-input-bordered w-full"
+                    onChange={handleFileChange}
+                    required
+                  />
+                </div>
+
+                {/* Image Preview */}
+                {imagePreview && (
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-600">Image Preview:</p>
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-40 object-cover rounded-lg border-2 mt-2"
+                    />
+                  </div>
+                )}
               </div>
-            </form>
-          </div>
+            </div>
+
+            <div className="form-control mt-6">
+              <button
+                type="submit"
+                className="btn bg-purple-500 text-black"
+                disabled={loading}
+              >
+                {loading ? "Uploading & Adding..." : "Add"}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

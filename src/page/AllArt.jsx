@@ -1,64 +1,68 @@
 import { useEffect, useState } from "react";
 import { Link, useLoaderData } from "react-router-dom";
-
-import { Slide } from "react-awesome-reveal";
+import supabase from "../../supabase-client";
 
 const AllArt = () => {
   const loadedData = useLoaderData();
-  const [allItems] = useState(loadedData);
-  const [isLoading, setIsLoading] = useState([]);
+  const [allArt, setAllArt] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setIsLoading(true);
-    fetch("https://assignment-10-server-nu-ashen.vercel.app/arts")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setIsLoading(false);
-      });
+    const fetchAllArts = async () => {
+      setIsLoading(true);
+      const { data, error } = await supabase.from("ArtList").select("*");
+      if (error) {
+        console.error(error);
+      } else {
+        setAllArt(data);
+      }
+      setIsLoading(false);
+    };
+
+    fetchAllArts();
   }, []);
 
   return (
-    <div>
-      <div className="flex flex-row justify-center items-center">
-        {isLoading ? (
-          <span className="loading loading-spinner loading-lg "></span>
-        ) : null}
-      </div>
-      <Slide>
-        <div>
-          <div className="lg:overflow-x-auto">
-            <table className="table">
-              {/* head */}
-              <thead>
-                <tr className="lg:text-xl text-purple-500">
-                  <th>Item Name</th>
-                  <th>Subcategory Name</th>
-                  <th>Price</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {/* row 1 */}
-                {allItems.map((item) => (
-                  <tr key={item._id} className="hover">
-                    <td>{item.item_name}</td>
-                    <td>{item.subcategory_name}</td>
-                    <td>{item.price}</td>
-                    <td>
-                      <Link to={`/view/${item._id}`}>
-                        <button className="lg:btn md:btn bg-[#eb9b40] lg:bg-[#eb9b40] md:bg-[#eb9b40] text-black lg:text-black md:text-black p-1 ">
-                          View Details
-                        </button>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+    <div className="container mx-auto px-6 py-12">
+      {/* Loading Spinner */}
+      {isLoading && (
+        <div className="flex justify-center mb-6">
+          <span className="loading loading-spinner loading-lg"></span>
         </div>
-      </Slide>
+      )}
+
+      {/* Masonry Grid Layout */}
+      <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
+        {allArt.map((item) => (
+          <div
+            key={item.id}
+            className="relative overflow-hidden rounded-lg shadow-lg group transition-transform transform hover:scale-105 hover:shadow-2xl"
+          >
+            {/* Image with Overlay */}
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-full object-cover rounded-lg"
+            />
+
+            {/* Overlay & Text */}
+            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+              <h2 className="text-white text-xl font-bold">{item.title}</h2>
+              <p className="text-gray-300">By {item.artist}</p>
+              <p className="text-lg font-semibold text-yellow-400 mt-1">
+                {item.year}
+              </p>
+
+              {/* View Details Button */}
+              <Link to={`/view/${item.id}`}>
+                <button className="mt-3 bg-[#eb9b40] hover:bg-[#d58a35] text-black font-semibold py-2 px-4 rounded-md transition-all">
+                  View Details
+                </button>
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

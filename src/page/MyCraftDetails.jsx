@@ -1,215 +1,241 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import supabase from "../../supabase-client";
 
 const MyCraftDetails = () => {
   const { id } = useParams();
-  const [crafts, setCrafts] = useState({});
+  const [craft, setCraft] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
   useEffect(() => {
-    fetch(`https://assignment-10-server-nu-ashen.vercel.app/craftDetails/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setCrafts(data);
-      });
+    const fetchCraftDetails = async () => {
+      const { data, error } = await supabase
+        .from("ArtList")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching craft details:", error);
+      } else {
+        setCraft(data);
+
+        setImagePreview(data.image); // Set existing image as preview
+      }
+    };
+
+    fetchCraftDetails();
   }, [id]);
 
-  const handleUpdate = (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const item_name = form.itemName.value;
-    const subcategory_name = form.subName.value;
-    const rating = form.rating.value;
-    const short_description = form.shortDes.value;
-    const price = form.price.value;
-    const customization = form.cust.value;
-    const processing_time = form.process.value;
-    const stockStatus = form.status.value;
-    const image = form.photoUrl.value;
-    const newCraft = {
-      item_name,
-      subcategory_name,
-      rating,
-      short_description,
-      price,
-      customization,
-      processing_time,
-      stockStatus,
-      image,
-    };
-    console.log(newCraft);
+  // Handle image file selection
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    fetch(
-      `https://assignment-10-server-nu-ashen.vercel.app/updateCraft/${id}`,
-      {
-        method: "PUT",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify(newCraft),
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        if (data.modifiedCount) {
-          Swal.fire({
-            text: "Updated item successfully",
-            icon: "success",
-            confirmButtonText: "Ok",
-          });
-        }
-      });
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file)); // Show preview before upload
   };
-  console.log(id);
+
+  // Handle form submission (update)
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const form = e.target;
+    const updatedCraft = {
+      item_name: form.itemName.value,
+      subcategory_name: form.subName.value,
+      short_description: form.shortDes.value,
+      price: form.price.value,
+      year: form.status.year,
+      artist: form.status.value,
+    };
+
+    // Upload image if a new one is selected
+    if (imageFile) {
+      try {
+        const fileName = `${Date.now()}-${imageFile.name}`;
+        const { error } = await supabase.storage
+          .from("art-images")
+          .upload(fileName, imageFile, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: imageFile.type,
+          });
+
+        if (error) throw error;
+
+        // Get the public URL
+        const { data: imageData } = supabase.storage
+          .from("art-images")
+          .getPublicUrl(fileName);
+        updatedCraft.image = imageData.publicUrl;
+      } catch (error) {
+        Swal.fire({
+          text: "Image upload failed",
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+        console.error(error);
+        setLoading(false);
+        return;
+      }
+    }
+
+    // Update the record in Supabase
+    const { error } = await supabase
+      .from("ArtList")
+      .update(updatedCraft)
+      .eq("id", id);
+
+    if (error) {
+      Swal.fire({
+        text: "Failed to update item",
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
+      console.error(error);
+    } else {
+      Swal.fire({
+        text: "Updated item successfully",
+        icon: "success",
+        confirmButtonText: "Ok",
+      });
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div>
-      <div className="">
-        <div className="hero-content flex-col lg:flex-row-reverse">
-          <div className="text-center lg:text-left"></div>
-          <div className="card shrink-0 w-full shadow-2xl bg-base-100 border-2 border-[#eb9b40]">
-            <form onSubmit={handleUpdate} className="card-body">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                {/* 1 */}
-                <div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">
-                        Item_Name
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Item_name"
-                      defaultValue={crafts.item_name}
-                      name="itemName"
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">
-                        Subcategory_Name
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="subcategory_name"
-                      defaultValue={crafts.subcategory_name}
-                      name="subName"
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">Rating</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="rating"
-                      name="rating"
-                      defaultValue={crafts.rating}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">
-                        Short Description
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="short description"
-                      name="shortDes"
-                      defaultValue={crafts.short_description}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
+      <div className="hero-content flex-col lg:flex-row-reverse">
+        <div className="card shrink-0 w-full shadow-2xl bg-base-100 border-2 border-[#eb9b40]">
+          <form onSubmit={handleUpdate} className="card-body">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Left Side */}
+              <div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Item Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="itemName"
+                    defaultValue={craft.title}
+                    className="input input-bordered"
+                    required
+                  />
                 </div>
-                {/* 2 */}
-                <div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold ">
-                        Customization
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="customization"
-                      name="cust"
-                      defaultValue={crafts.customization}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">
-                        Processing_time
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="processing_time"
-                      name="process"
-                      defaultValue={crafts.processing_time}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">
-                        StockStatus
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="StockStatus"
-                      name="status"
-                      defaultValue={crafts.stockStatus}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">Price</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="price"
-                      name="price"
-                      defaultValue={crafts.price}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Category</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="subName"
+                    defaultValue={craft.category}
+                    className="input input-bordered"
+                    required
+                  />
                 </div>
-              </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Image</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="photoUrl"
-                  defaultValue={crafts.image}
-                  name="photoUrl"
-                  className="input input-bordered"
-                  required
-                />
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">
+                      Description
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    name="shortDes"
+                    defaultValue={craft.description}
+                    className="input input-bordered"
+                    required
+                  />
+                </div>
               </div>
 
-              <div className="form-control mt-6">
-                <button className="btn bg-[#eb9b40] text-black">Update</button>
+              {/* Right Side */}
+              <div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Artist</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="status"
+                    defaultValue={craft.artist}
+                    className="input input-bordered"
+                    required
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Year</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="status"
+                    defaultValue={craft.year}
+                    className="input input-bordered"
+                    required
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Price</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="price"
+                    defaultValue={craft.price}
+                    className="input input-bordered"
+                    required
+                  />
+                </div>
               </div>
-            </form>
-          </div>
+            </div>
+
+            {/* Image Upload */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">Upload Image</span>
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                className="file-input file-input-bordered w-full"
+                onChange={handleFileChange}
+              />
+            </div>
+
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="mt-4">
+                <p className="text-sm text-gray-600">Image Preview:</p>
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-96 object-cover rounded-lg border-2 mt-2"
+                />
+              </div>
+            )}
+
+            <div className="form-control mt-6">
+              <button
+                type="submit"
+                className="btn bg-[#eb9b40] text-black"
+                disabled={loading}
+              >
+                {loading ? "Updating..." : "Update"}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
