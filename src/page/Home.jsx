@@ -81,8 +81,14 @@ const Home = () => {
       <SectionTitle title="The Artist" />
       <ArtShowcase
         image={Amara}
-        title="Amara Okparachi"
-        description="Amara Okparachi is a renowned impressionist artist known for her dramatic and expressive works. Her art tells deep stories, and her quick mind has led her to make significant discoveries in the art space."
+        title="Amarachi Okpara – The Art Specialist"
+        description="
+
+Amarachi Okpara is a renowned artist specialist, celebrated for her expertise in curating, evaluating, and promoting exceptional artworks. With years of experience in the art industry, she has established herself as a leading figure, connecting collectors, galleries, and artists with some of the most sought-after pieces in the market.
+
+Her keen eye for artistic excellence, deep knowledge of art history, and strong market influence make her a trusted name in the industry. Whether working with emerging artists or well-established creators, Amarachi is dedicated to elevating artistic talent and ensuring that every piece she represents holds significant value.
+
+As a major force in the art world, Amarachi Okpara is committed to fostering creativity, expanding the reach of fine art, and providing expert guidance to clients seeking rare and extraordinary works. Her passion for art and dedication to excellence continue to shape the industry, making her a true specialist in her field."
       />
 
       {/* Section: Art Categories */}
