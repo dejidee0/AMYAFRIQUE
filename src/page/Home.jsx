@@ -52,7 +52,7 @@ const Home = () => {
                 />
                 <div className="p-5 text-center">
                   <p className="text-lg">{data.short_description}</p>
-                  <Link to={`/view/${data._id}`}>
+                  <Link to={`/view/${data.id}`}>
                     <button className="mt-4 px-6 py-2 bg-[#eb9b40] text-white font-semibold rounded-lg transition-all hover:bg-[#d88a36]">
                       View Details
                     </button>
