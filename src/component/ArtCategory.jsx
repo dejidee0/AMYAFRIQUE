@@ -1,41 +1,47 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import supabase from "../../supabase-client"; // Ensure this is correctly imported
 
 const ArtCategory = () => {
   const [categories, setCategories] = useState([]);
-  const [isLoading, setIsLoading] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
-    fetch("https://assignment-10-server-nu-ashen.vercel.app/artSub")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
+    const fetchCategories = async () => {
+      setIsLoading(true);
+      const { data, error } = await supabase.from("artSub").select("*");
+
+      if (error) {
+        console.error("Error fetching categories:", error);
+      } else {
         setCategories(data);
-        setIsLoading(false);
-      });
+      }
+      setIsLoading(false);
+    };
+
+    fetchCategories();
   }, []);
 
   return (
     <div>
-      <div className="flex flex-row justify-center items-center">
-        {isLoading ? (
-          <span className="loading loading-spinner loading-lg "></span>
-        ) : null}
+      <div className="flex justify-center items-center">
+        {isLoading && (
+          <span className="loading loading-spinner loading-lg"></span>
+        )}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {categories.map((category) => (
-          <div key={category._id} className="card ">
+          <div key={category.id} className="card">
             <figure className="relative">
-              <Link to={`/subCa/${category.subcategory_name}`}>
+              <Link to={`/subCa/${category.category}`}>
                 <img
                   src={category.image}
-                  alt=""
-                  className=" hover:border-red-500 hover:border-4 rounded-xl h-[200px] w-[300px] border-2 border-[#eb9b40]"
+                  alt={category.category}
+                  className="hover:border-red-500 hover:border-4 rounded-xl h-[200px] w-[300px] border-2 border-[#eb9b40]"
                 />
               </Link>
-              <h1 className="absolute top-auto bottom-4 font-bold text-xl text-white bg-[#eb9b40] p-1">
-                {category.subcategory_name}
+              <h1 className="absolute bottom-4 font-bold text-xl text-white bg-[#eb9b40] p-1">
+                {category.category}
               </h1>
             </figure>
           </div>

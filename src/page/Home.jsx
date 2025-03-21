@@ -92,12 +92,12 @@ As a major force in the art world, Amarachi Okpara is committed to fostering cre
       />
 
       {/* Section: Art Categories */}
-      <SectionTitle title="Art Categories" />
+      {/* <SectionTitle title="Art Categories" />
       <div className="mt-10 px-8">
         <Zoom>
           <ArtCategory />
         </Zoom>
-      </div>
+      </div> */}
     </div>
   );
 };
