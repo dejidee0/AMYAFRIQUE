@@ -12,6 +12,7 @@
   "dependencies": {
     "@paystack/inline-js": "^2.22.2",
     "@supabase/supabase-js": "^2.49.1",
+    "framer-motion": "^12.6.2",
     "localforage": "^1.10.0",
     "lottie-react": "^2.4.0",
     "match-sorter": "^6.3.4",
