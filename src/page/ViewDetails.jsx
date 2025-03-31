@@ -6,6 +6,7 @@ import { toast, ToastContainer } from "react-toastify";
 import supabase from "../../supabase-client";
 import "react-toastify/dist/ReactToastify.css";
 import { motion } from "framer-motion";
+import MagnifyView from "../component/MagnifyView";
 
 const ViewDetails = () => {
   const { id } = useParams();
@@ -302,113 +303,10 @@ const ViewDetails = () => {
 
       {/* Magnify Modal */}
       {magnifyView && (
-        <div
-          className="fixed inset-0 bg-black/95 flex items-center justify-center z-50"
-          onClick={() => setMagnifyView(false)}
-        >
-          <div
-            className="relative w-[95vw] h-[90vh] max-w-7xl max-h-[90vh] bg-gray-950 rounded-3xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Toolbar */}
-            <div className="absolute top-0 left-0 right-0 z-10 p-4 bg-gradient-to-b from-black/70 via-black/30 to-transparent">
-              <div className="flex justify-between items-center">
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setScale((s) => Math.max(s - 0.2, 0.5))}
-                    className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                    aria-label="Zoom out"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white">
-                      <path d="M19 13H5v-2h14v2z" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => setScale((s) => Math.min(s + 0.2, 4))}
-                    className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                    aria-label="Zoom in"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white">
-                      <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={resetView}
-                    className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                    aria-label="Reset view"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-                    </svg>
-                  </button>
-                </div>
-                <button
-                  onClick={() => setMagnifyView(false)}
-                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                  aria-label="Close viewer"
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white">
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Image Container */}
-            <div
-              ref={containerRef}
-              className="absolute inset-0 overflow-hidden"
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onWheel={handleWheel}
-              style={{ cursor: isDragging ? "grabbing" : "grab" }}
-            >
-              <img
-                ref={imgRef}
-                src={views.image}
-                alt={views.name}
-                className="w-full h-full object-contain transition-transform duration-300"
-                style={{
-                  transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-                  willChange: "transform",
-                }}
-              />
-
-              {/* Lens Cursor */}
-              <div
-                className="absolute rounded-full bg-white/10 backdrop-blur-lg border border-white/20 pointer-events-none"
-                style={{
-                  width: lensSize,
-                  height: lensSize,
-                  left: cursorPos.x - lensSize / 2,
-                  top: cursorPos.y - lensSize / 2,
-                  display: "block",
-                }}
-              >
-                <img
-                  src={views.image}
-                  alt={views.name}
-                  className="w-full h-full object-cover"
-                  style={{
-                    transform: `scale(2) translate(-${cursorPos.x * 2}px, -${
-                      cursorPos.y * 2
-                    }px)`,
-                    clipPath: `circle(${lensSize / 2}px at center)`,
-                  }}
-                />
-              </div>
-
-              {/* Zoom Level */}
-              <div className="absolute bottom-4 left-4 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full text-white text-sm">
-                Zoom: {(scale * 100).toFixed(0)}%
-              </div>
-            </div>
-          </div>
-        </div>
+        <MagnifyView
+          image={views.image}
+          onClose={() => setMagnifyView(false)}
+        />
       )}
     </div>
   );

@@ -40,3 +40,14 @@
 .read-the-docs {
   color: #888;
 }
+
+@media (pointer: coarse) {
+  .image-magnify-glass {
+    display: none !important;
+  }
+
+  .react-transform-wrapper {
+    touch-action: none;
+    -ms-touch-action: none;
+  }
+}
