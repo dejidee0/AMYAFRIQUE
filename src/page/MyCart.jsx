@@ -7,6 +7,8 @@ const MyCart = () => {
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const getTotal = useCartStore((state) => state.getTotal);
 
+  console.log(cartItems);
+
   return (
     <Fade triggerOnce duration={500}>
       <div className="min-h-screen p-8 flex flex-col md:flex-row gap-8 bg-gradient-to-br from-gray-50 to-gray-100">
@@ -32,19 +34,19 @@ const MyCart = () => {
             </Fade>
           ) : (
             <Slide cascade damping={0.1} duration={300}>
-              {cartItems.map(({ _id, item_name, image, price, quantity }) => (
+              {cartItems.map(({ id, item_title, image, price, quantity }) => (
                 <div
-                  key={_id}
+                  key={id}
                   className="group flex items-center gap-4 p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
                 >
                   <img
                     src={image}
-                    alt={item_name}
+                    alt={item_title}
                     className="w-24 h-24 object-cover rounded-lg border-2 border-gray-100"
                   />
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg text-gray-800">
-                      {item_name}
+                      {item_title}
                     </h3>
                     <div className="flex gap-4 mt-2 text-gray-600">
                       <p>${price}</p>
@@ -53,7 +55,7 @@ const MyCart = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => removeFromCart(_id)}
+                    onClick={() => removeFromCart(id)}
                     className="text-red-400 hover:text-red-600 transition-colors p-2 rounded-full hover:bg-red-50"
                     aria-label="Remove item"
                   >

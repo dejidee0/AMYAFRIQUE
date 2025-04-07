@@ -12,16 +12,9 @@ const ViewDetails = () => {
   const { id } = useParams();
   const [views, setViews] = useState(null);
   const [magnifyView, setMagnifyView] = useState(false);
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
-  const [lensSize, setLensSize] = useState(250);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const imgRef = useRef(null);
-  const containerRef = useRef(null);
-  const dragStart = useRef({ x: 0, y: 0, distance: 0 });
 
   const { addToCart, removeFromCart, cartItems } = useCartStore();
   const isInCart = cartItems.some((item) => item.id === views?.id);
@@ -44,116 +37,19 @@ const ViewDetails = () => {
       setLoading(false);
     }
   }, [id]);
-
+  console.log(views);
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   const handleAddToCart = () => {
     addToCart(views);
-    toast.success(`${views.name} added to cart`, { autoClose: 2000 });
+    toast.success(`${views.title} added to cart`, { autoClose: 2000 });
   };
 
   const handleRemoveFromCart = () => {
     removeFromCart(views.id);
-    toast.warn(`${views.name} removed from cart`, { autoClose: 2000 });
-  };
-
-  const handleMouseDown = (e) => {
-    if (e.button !== 0) return;
-    setIsDragging(true);
-    dragStart.current = {
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
-    };
-  };
-
-  const handleMouseMove = useCallback(
-    (e) => {
-      if (!isDragging || !imgRef.current) return;
-
-      const newX = e.clientX - dragStart.current.x;
-      const newY = e.clientY - dragStart.current.y;
-
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const imgRect = imgRef.current.getBoundingClientRect();
-
-      const maxX = containerRect.width - imgRect.width * scale;
-      const maxY = containerRect.height - imgRect.height * scale;
-
-      setPosition({
-        x: Math.max(Math.min(newX, 0), maxX),
-        y: Math.max(Math.min(newY, 0), maxY),
-      });
-    },
-    [isDragging, scale, position]
-  );
-
-  const handleMouseUp = () => setIsDragging(false);
-
-  const handleWheel = useCallback(
-    (e) => {
-      e.preventDefault();
-      const newScale = Math.min(Math.max(scale + e.deltaY * -0.01, 0.5), 4);
-
-      // Calculate new position to maintain focus point
-      const rect = containerRef.current.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
-      const ratioX = (mouseX - position.x) / scale;
-      const ratioY = (mouseY - position.y) / scale;
-
-      const newX = position.x - ratioX * (newScale - scale);
-      const newY = position.y - ratioY * (newScale - scale);
-
-      setPosition({
-        x: newX,
-        y: newY,
-      });
-
-      setScale(newScale);
-    },
-    [scale, position]
-  );
-
-  const handleTouchStart = (e) => {
-    if (e.touches.length === 2) {
-      const t1 = e.touches[0];
-      const t2 = e.touches[1];
-      dragStart.current.distance = Math.hypot(
-        t2.clientX - t1.clientX,
-        t2.clientY - t1.clientY
-      );
-      dragStart.current.scale = scale;
-    }
-  };
-
-  const handleTouchMove = useCallback((e) => {
-    if (e.touches.length === 2 && dragStart.current.distance) {
-      const t1 = e.touches[0];
-      const t2 = e.touches[1];
-      const newDistance = Math.hypot(
-        t2.clientX - t1.clientX,
-        t2.clientY - t1.clientY
-      );
-
-      const newScale =
-        dragStart.current.scale * (newDistance / dragStart.current.distance);
-      setScale(Math.min(Math.max(0.5, newScale), 4));
-    }
-  }, []);
-
-  const handleImageMouseMove = useCallback((e) => {
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setCursorPos({ x, y });
-  }, []);
-
-  const resetView = () => {
-    setPosition({ x: 0, y: 0 });
-    setScale(1);
+    toast.warn(`${views.title} removed from cart`, { autoClose: 2000 });
   };
 
   if (loading) {
@@ -211,7 +107,7 @@ const ViewDetails = () => {
           <div className="relative group">
             <img
               src={views.image}
-              alt={views.name}
+              alt={views.title}
               className="w-full h-[400px] md:h-[500px] object-cover rounded-2xl shadow-lg transition-transform duration-300 group-hover:scale-105"
             />
             <button
@@ -228,7 +124,7 @@ const ViewDetails = () => {
           {/* Details Section */}
           <div className="flex flex-col justify-center">
             <h1 className="text-4xl md:text-5xl font-extrabold text-[#eb9b40] mb-6">
-              {views.name}
+              {views.description}
             </h1>
 
             <div className="grid grid-cols-2 gap-4 mb-8">

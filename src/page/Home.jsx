@@ -1,8 +1,8 @@
-import { Link, useLoaderData } from "react-router-dom";
-import { Fade, Slide, Zoom } from "react-awesome-reveal";
+import { Link } from "react-router-dom";
+import { Fade, Slide } from "react-awesome-reveal";
 import { useEffect, useState } from "react";
 import Slider from "../component/Slider";
-import ArtCategory from "../component/ArtCategory";
+
 import supabase from "../../supabase-client";
 
 import Amara from "../assets/amara.jpg";
@@ -10,7 +10,6 @@ import wooden from "../assets/wooden.jpg";
 import nature from "../assets/nature.jpg";
 
 const Home = () => {
-  const loadedData = useLoaderData();
   const [allArt, setAllArt] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -90,14 +89,6 @@ Her keen eye for artistic excellence, deep knowledge of art history, and strong 
 
 As a major force in the art world, Amarachi Okpara is committed to fostering creativity, expanding the reach of fine art, and providing expert guidance to clients seeking rare and extraordinary works. Her passion for art and dedication to excellence continue to shape the industry, making her a true specialist in her field."
       />
-
-      {/* Section: Art Categories */}
-      {/* <SectionTitle title="Art Categories" />
-      <div className="mt-10 px-8">
-        <Zoom>
-          <ArtCategory />
-        </Zoom>
-      </div> */}
     </div>
   );
 };

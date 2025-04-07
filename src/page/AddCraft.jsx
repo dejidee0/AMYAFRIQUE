@@ -160,6 +160,18 @@ const AddCraft = () => {
                     <option value="Cartoon Drawing">Cartoon Drawing</option>
                   </select>
                 </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Price</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="price"
+                    placeholder="Price"
+                    className="input input-bordered"
+                    required
+                  />
+                </div>
               </div>
 
               {/* Right Side */}

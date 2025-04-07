@@ -12,6 +12,7 @@ const AllArt = () => {
       setIsLoading(true);
       try {
         const { data, error } = await supabase.from("ArtList").select("*");
+
         if (error) {
           throw error;
         }
