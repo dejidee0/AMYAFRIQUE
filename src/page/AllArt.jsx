@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import supabase from "../../supabase-client";
 
+const ITEMS_PER_PAGE = 20;
+
 const AllArt = () => {
   const [allArt, setAllArt] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchAllArts = async () => {
@@ -43,37 +46,37 @@ const AllArt = () => {
     </div>
   );
 
+  // Pagination Logic
+  const totalPages = Math.ceil(allArt.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentArt = allArt.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   return (
     <div className="container mx-auto px-6 py-12">
-      {/* Loading Spinner */}
       {isLoading && (
         <div className="flex justify-center mb-6">
           <span className="loading loading-spinner loading-lg"></span>
         </div>
       )}
 
-      {/* Error Message */}
       {error && (
         <div className="text-red-500 text-center my-4">
           Failed to load art: {error}
         </div>
       )}
 
-      {/* Masonry Grid Layout */}
       <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
-        {allArt.map((item) => (
+        {currentArt.map((item) => (
           <div
             key={item.id}
             className="relative overflow-hidden rounded-lg shadow-lg group transition-transform transform hover:scale-105 hover:shadow-2xl"
           >
-            {/* Image with Magnification */}
             <img
               src={item.image}
               alt={item.title}
               className="w-full object-cover rounded-lg"
             />
 
-            {/* Overlay */}
             <ArtOverlay
               title={item.title}
               artist={item.artist}
@@ -83,6 +86,25 @@ const AllArt = () => {
           </div>
         ))}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-10 space-x-2">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              className={`w-10 h-10 rounded-full ${
+                currentPage === index + 1
+                  ? "bg-[#eb9b40] text-white"
+                  : "bg-gray-200 text-gray-700"
+              } hover:bg-[#d58a35] transition`}
+              onClick={() => setCurrentPage(index + 1)}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
