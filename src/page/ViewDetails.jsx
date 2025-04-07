@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { FaCartPlus, FaCheckCircle } from "react-icons/fa";
 import { useCartStore } from "../store/cartStore";
@@ -131,15 +131,19 @@ const ViewDetails = () => {
                 </p>
               </div>
               <div>
+                <p className="text-gray-400 text-sm">Price</p>
+                <p className="text-lg text-green-400 font-bold">
+                  ₦{(views.price * 1000).toLocaleString()}
+                </p>
+              </div>
+              <div>
                 <p className="text-gray-400 text-sm">Stock Status</p>
                 <p
                   className={`text-lg font-semibold ${
-                    views.stockStatus === "In Stock"
-                      ? "text-green-400"
-                      : "text-red-400"
+                    views.stockStatus ? "text-green-400" : "text-red-400"
                   }`}
                 >
-                  {views.stockStatus}
+                  {views.stockStatus ? "Available" : "Sold"}
                 </p>
               </div>
             </div>
@@ -154,21 +158,28 @@ const ViewDetails = () => {
             </div>
 
             <div className="flex flex-col md:flex-row gap-4">
-              {isInCart ? (
-                <button
-                  onClick={handleRemoveFromCart}
-                  className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center justify-center gap-2"
-                >
-                  <FaCheckCircle /> In Cart
-                </button>
+              {views.stockStatus ? (
+                isInCart ? (
+                  <button
+                    onClick={handleRemoveFromCart}
+                    className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    <FaCheckCircle /> In Cart
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleAddToCart}
+                    className="flex-1 px-6 py-3 bg-[#eb9b40] hover:bg-[#d18a38] text-black rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    <FaCartPlus /> Add to Cart
+                  </button>
+                )
               ) : (
-                <button
-                  onClick={handleAddToCart}
-                  className="flex-1 px-6 py-3 bg-[#eb9b40] hover:bg-[#d18a38] text-black rounded-lg transition-colors flex items-center justify-center gap-2"
-                >
-                  <FaCartPlus /> Add to Cart
+                <button className="flex-1 px-6 py-3 bg-slate-600 hover:bg-slate-700 text-black rounded-lg transition-colors flex items-center justify-center gap-2">
+                  <FaCartPlus /> Not Available
                 </button>
               )}
+
               <button
                 onClick={() => setMagnifyView(true)}
                 className="flex-1 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors flex items-center justify-center gap-2"

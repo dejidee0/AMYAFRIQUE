@@ -26,6 +26,7 @@ const AddCraft = () => {
     const description = form.description.value;
     const price = form.description.price;
     const artist = form.artist.value;
+    const stockStatus = true;
     const year = form.year.value;
 
     // Ensure an image is selected
@@ -70,6 +71,7 @@ const AddCraft = () => {
 
     const newArt = {
       title,
+      stockStatus,
       description,
       price,
       image: imageUrl,

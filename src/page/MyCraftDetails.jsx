@@ -47,7 +47,7 @@ const MyCraftDetails = () => {
     const form = e.target;
     const updatedCraft = {
       item_name: form.itemName.value,
-      subcategory_name: form.subName.value,
+
       short_description: form.shortDes.value,
       price: form.price.value,
       year: form.status.year,
