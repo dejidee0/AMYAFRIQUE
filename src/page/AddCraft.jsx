@@ -21,9 +21,10 @@ const AddCraft = () => {
     setLoading(true);
 
     const form = e.target;
+
     const title = form.title.value;
     const description = form.description.value;
-    const category = form.category.value;
+    const price = form.description.price;
     const artist = form.artist.value;
     const year = form.year.value;
 
@@ -70,7 +71,7 @@ const AddCraft = () => {
     const newArt = {
       title,
       description,
-      category,
+      price,
       image: imageUrl,
       artist,
       year,
@@ -136,30 +137,6 @@ const AddCraft = () => {
                   />
                 </div>
 
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-semibold">Category</span>
-                  </label>
-                  <select
-                    name="category"
-                    className="border-2 input-bordered w-full p-2"
-                    required
-                  >
-                    <option value=""></option>
-                    <option value="Landscape Painting">
-                      Landscape Painting
-                    </option>
-                    <option value="Portrait Drawing">Portrait Drawing</option>
-                    <option value="Watercolor Painting">
-                      Watercolor Painting
-                    </option>
-                    <option value="Oil Painting">Oil Painting</option>
-                    <option value="Charcoal Sketching">
-                      Charcoal Sketching
-                    </option>
-                    <option value="Cartoon Drawing">Cartoon Drawing</option>
-                  </select>
-                </div>
                 <div className="form-control">
                   <label className="label">
                     <span className="label-text font-semibold">Price</span>
