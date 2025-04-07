@@ -108,7 +108,7 @@ const ViewDetails = () => {
             <img
               src={views.image}
               alt={views.title}
-              className="w-full h-[400px] md:h-[500px] object-cover rounded-2xl shadow-lg transition-transform duration-300 group-hover:scale-105"
+              className="w-full h-[450px] md:h-[500px] object-cover rounded-2xl shadow-lg transition-transform duration-300 group-hover:scale-105"
             />
             <button
               onClick={() => setMagnifyView(true)}
@@ -123,17 +123,7 @@ const ViewDetails = () => {
 
           {/* Details Section */}
           <div className="flex flex-col justify-center">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-[#eb9b40] mb-6">
-              {views.description}
-            </h1>
-
             <div className="grid grid-cols-2 gap-4 mb-8">
-              <div>
-                <p className="text-gray-400 text-sm">Category</p>
-                <p className="text-lg text-gray-200 font-semibold">
-                  {views.category}
-                </p>
-              </div>
               <div>
                 <p className="text-gray-400 text-sm">Artist</p>
                 <p className="text-lg text-green-400 font-bold">
