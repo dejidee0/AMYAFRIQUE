@@ -22,16 +22,16 @@ const Footer = () => {
             </p>
 
             <a className="text-lg  font-semibold link link-hover underline underline-offset-2 text-white">
-              Info@amyafrique.com
+              Amyafriquee@gmail.com
             </a>
           </nav>
           <nav>
             <Flip>
               <img className="w-[100px] h-[100px]" src={logo} alt="" />{" "}
             </Flip>
-            <h2 className="font-bold text-3xl text-white">Amara Okparachi</h2>
+            <h2 className="font-bold text-3xl text-white">Amarachi Okpara</h2>
             <p className="text-black mt-10 font-semibold">
-              Copyright © 2024 - All right reserved by Info@amyafrique.net
+              Copyright © 2024 - All right reserved by amyafrique.net
             </p>
           </nav>
         </footer>
