@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // 👈 import this at the top
+
 import Lottie from "lottie-react";
 import animation from "../assets/Animation - 1714318361741.json";
 import Swal from "sweetalert2";
@@ -11,6 +13,10 @@ const Register = () => {
   const [email, setEmail] = useState("");
 
   const [password, setPassword] = useState("");
+  const [verifyPassword, setVerifyPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showVerifyPassword, setShowVerifyPassword] = useState(false);
+
   const [message, setMessage] = useState("");
   const [registerError, setRegisterError] = useState("");
   const navigate = useNavigate();
@@ -30,6 +36,10 @@ const Register = () => {
       return;
     } else if (!/[a-z]/.test(password)) {
       setRegisterError("Password should have at least one lowercase letter.");
+      return;
+    }
+    if (password !== verifyPassword) {
+      setRegisterError("Passwords do not match.");
       return;
     }
 
@@ -84,7 +94,6 @@ const Register = () => {
             {registerError && (
               <p className="text-red-400 text-center mb-2">{registerError}</p>
             )}
-
             <form onSubmit={handleRegister} className="card-body">
               <div className="form-control">
                 <label className="label">
@@ -114,19 +123,47 @@ const Register = () => {
                 />
               </div>
 
-              <div className="form-control">
+              <div className="form-control relative">
                 <label className="label">
                   <span className="label-text">Password</span>
                 </label>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Enter password"
-                  className="input input-bordered"
+                  className="input input-bordered pr-10"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                <div
+                  className="absolute right-3 top-11 cursor-pointer text-gray-600"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </div>
               </div>
+
+              {password.length > 0 && (
+                <div className="form-control relative mt-3">
+                  <label className="label">
+                    <span className="label-text">Verify Password</span>
+                  </label>
+                  <input
+                    type={showVerifyPassword ? "text" : "password"}
+                    placeholder="Re-enter password"
+                    className="input input-bordered pr-10"
+                    required
+                    value={verifyPassword}
+                    onChange={(e) => setVerifyPassword(e.target.value)}
+                  />
+                  <div
+                    className="absolute right-3 top-11 cursor-pointer text-gray-600"
+                    onClick={() => setShowVerifyPassword(!showVerifyPassword)}
+                  >
+                    {showVerifyPassword ? <FaEyeSlash /> : <FaEye />}
+                  </div>
+                </div>
+              )}
 
               <div className="form-control mt-6">
                 <button className="btn bg-orange-500 text-black">

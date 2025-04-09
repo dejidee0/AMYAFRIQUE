@@ -52,16 +52,24 @@ const Navbar = () => {
       <NavLink to={"/allArt"} className={"text-[#eb9b40] font-extrabold"}>
         All Art
       </NavLink>
-      {user && (
+      <NavLink to={"/events"} className={"text-[#eb9b40] font-extrabold"}>
+        Events
+      </NavLink>
+      <NavLink to={"/aboutUs"} className={"text-[#eb9b40] font-extrabold"}>
+        About Us
+      </NavLink>
+      {user?.email === "dnlcodes4@gmail.com" && (
         <NavLink to={"/addCraft"} className={"text-[#eb9b40] font-extrabold"}>
           Add Art Item
         </NavLink>
       )}
-      {user && (
-        <NavLink to={"/myCraft"} className={"text-[#eb9b40] font-extrabold"}>
-          My Art List
+
+      {user?.email === "dnlcodes4@gmail.com" && (
+        <NavLink to={"/addCraft"} className={"text-[#eb9b40] font-extrabold"}>
+          Add Art Item
         </NavLink>
       )}
+
       {user && (
         <NavLink to={"/myCart"} className={"text-[#eb9b40] font-extrabold"}>
           My Cart

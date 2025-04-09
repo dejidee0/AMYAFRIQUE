@@ -13,6 +13,8 @@ import MyCraftDetails from "../page/MyCraftDetails";
 import ViewDetails from "../page/ViewDetails";
 import SubCategory from "../page/SubCategory";
 import Test from "../page/Test";
+import About from "../page/About";
+import Events from "../page/Events";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +33,14 @@ const router = createBrowserRouter([
       {
         path: "/allArt",
         element: <AllArt></AllArt>,
+      },
+      {
+        path: "/aboutUs",
+        element: <About></About>,
+      },
+      {
+        path: "/events",
+        element: <Events></Events>,
       },
       {
         path: "/addCraft",
