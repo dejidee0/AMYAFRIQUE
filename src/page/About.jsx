@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Fade, Slide } from "react-awesome-reveal";
+import MissionVisionValues from "../component/Missions";
+import TestimonialsSection from "../component/Testimonials";
 
 const About = () => {
   const [showFullText, setShowFullText] = useState(false);
@@ -10,7 +12,7 @@ const About = () => {
 
   return (
     <>
-      <div className="h-auto sm:h-[80vh] flex flex-col sm:flex-row justify-around items-center relative px-4 py-8 overflow-hidden rounded-lg shadow-lg">
+      <div className="h-auto sm:h-auto flex flex-col lg:flex-row justify-around items-center relative px-4 py-8 md:py-2 overflow-hidden ">
         {/* Image Section */}
         <Fade delay={200}>
           <div className="h-[350px] sm:h-[530px] w-full sm:w-auto object-cover mb-6 sm:mb-0 rounded-xl shadow-xl">
@@ -23,9 +25,9 @@ const About = () => {
         </Fade>
 
         {/* Text Content Section */}
-        <div className="text-center sm:text-left max-w-3xl px-6 sm:px-0">
+        <div className="text-center sm:text-left max-w-3xl px-6 sm:px-0 md:py-8">
           <Slide direction="left" delay={200}>
-            <h1 className="text-[#eb9b40] font-bold text-3xl sm:text-5xl mb-6 font-greatvibes">
+            <h1 className="text-[#eb9b40] font-bold text-3xl sm:text-4xl mb-6 font-greatvibes sm:py-3">
               The Artist behind the Artistry
             </h1>
           </Slide>
@@ -33,7 +35,7 @@ const About = () => {
           <hr className="mt-4 pl-7 border-2 border-[#eb9b40] w-1/2 mx-auto sm:mx-0" />
           <Fade delay={300}>
             <p className="text-gray-200 mt-6 text-base sm:text-base leading-relaxed font-greatvibes">
-              <span className="text-[#eb9b40] text-2xl sm:text-3xl font-greatvibes">
+              <span className="text-[#eb9b40] text-2xl sm:text-3xl">
                 Okpara Judith Amarachi{" "}
               </span>
               was born in Orlu, Imo State, Nigeria, in 1994 and displayed
@@ -87,7 +89,7 @@ const About = () => {
       </div>
 
       {/* Education and Awards Section */}
-      <div className="py-16 px-4 bg-gray-800">
+      {/* <div className="py-16 px-4 bg-gray-800">
         <div className="max-w-4xl mx-auto">
           <Fade delay={500}>
             <h2 className="text-[#eb9b40] font-bold text-3xl sm:text-4xl text-center mb-6">
@@ -96,7 +98,7 @@ const About = () => {
           </Fade>
 
           <div className="flex flex-col sm:flex-row gap-8">
-            {/* Education Section */}
+
             <div className="mb-8 flex-1">
               <Slide direction="left" delay={600}>
                 <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-gray-200">
@@ -121,7 +123,7 @@ const About = () => {
               </ul>
             </div>
 
-            {/* Awards Section */}
+            
             <div className="flex-1">
               <Slide direction="right" delay={600}>
                 <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-gray-200">
@@ -143,7 +145,10 @@ const About = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
+
+      <MissionVisionValues />
+      <TestimonialsSection />
     </>
   );
 };
