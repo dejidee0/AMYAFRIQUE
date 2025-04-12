@@ -6,7 +6,7 @@ import AllArt from "../page/AllArt";
 import AddCraft from "../page/AddCraft";
 import MyCraft from "../page/MyCraft";
 import MyCart from "../page/MyCart";
-import Logged from "../page/Logged";
+import Login from "../page/Logged";
 import Register from "../page/Register";
 import PrivateRoute from "../private/PrivateRoute";
 import MyCraftDetails from "../page/MyCraftDetails";
@@ -15,6 +15,7 @@ import SubCategory from "../page/SubCategory";
 import Test from "../page/Test";
 import About from "../page/About";
 import Events from "../page/Events";
+import PaymentCallback from "../page/PaymentCallback";
 
 const router = createBrowserRouter([
   {
@@ -75,8 +76,8 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/logged",
-        element: <Logged></Logged>,
+        path: "/login",
+        element: <Login></Login>,
       },
       {
         path: "/register",
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
       {
         path: "/test",
         element: <Test></Test>,
+      },
+      {
+        path: "/paymentCallback",
+        element: <PaymentCallback />,
       },
     ],
   },

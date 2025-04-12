@@ -185,7 +185,7 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="flex flex-row gap-3">
-                <Link to={"/logged"}>
+                <Link to={"/login"}>
                   <button className="lg:btn md:btn lg:bg-[#eb9b40] md:bg-[#eb9b40] text-orange-500 font-bold p-1">
                     Login
                   </button>

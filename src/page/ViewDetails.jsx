@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FaCartPlus, FaCheckCircle } from "react-icons/fa";
 import { useCartStore } from "../store/cartStore";
@@ -7,9 +7,15 @@ import supabase from "../../supabase-client";
 import "react-toastify/dist/ReactToastify.css";
 import { motion } from "framer-motion";
 import MagnifyView from "../component/MagnifyView";
+import { useNavigate } from "react-router-dom";
+
+import useAuthStore from "../store/authStore";
 
 const ViewDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate(); // 👈 add this
+  const user = useAuthStore((state) => state.user);
+
   const [views, setViews] = useState(null);
   const [magnifyView, setMagnifyView] = useState(false);
 
@@ -37,12 +43,18 @@ const ViewDetails = () => {
       setLoading(false);
     }
   }, [id]);
-  console.log(views);
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   const handleAddToCart = () => {
+    if (!user) {
+      toast.info("Please log in to add items to your cart", {
+        autoClose: 2000,
+      });
+      navigate("/login"); // 👈 redirect to login
+      return;
+    }
     addToCart(views);
     toast.success(`${views.title} added to cart`, { autoClose: 2000 });
   };
@@ -106,6 +118,7 @@ const ViewDetails = () => {
           {/* Image Section */}
           <div className="relative group">
             <img
+              loading="lazy"
               src={views.image}
               alt={views.title}
               className="w-full h-[450px] md:h-[500px] object-cover rounded-2xl shadow-lg transition-transform duration-300 group-hover:scale-105"

@@ -8,7 +8,7 @@ export const useCartStore = create(
       cartItems: [],
       addToCart: (item) => {
         set((state) => {
-          const existingItem = state.cartItems.find((i) => i._id === item._id);
+          const existingItem = state.cartItems.find((i) => i.id === item.id);
           if (existingItem) {
             return state; // If already in cart, do nothing
           }
@@ -17,7 +17,7 @@ export const useCartStore = create(
       },
       removeFromCart: (itemId) => {
         set((state) => ({
-          cartItems: state.cartItems.filter((item) => item._id !== itemId),
+          cartItems: state.cartItems.filter((item) => item.id !== itemId),
         }));
       },
 
@@ -31,7 +31,7 @@ export const useCartStore = create(
       adjustQuantity: (itemId, newQuantity) => {
         set((state) => ({
           cartItems: state.cartItems.map((item) =>
-            item._id === itemId ? { ...item, quantity: newQuantity } : item
+            item.id === itemId ? { ...item, quantity: newQuantity } : item
           ),
         }));
       },

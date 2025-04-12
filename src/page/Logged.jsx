@@ -7,7 +7,7 @@ import { Slide } from "react-awesome-reveal";
 
 import animationTwo from "../assets/Animation - 1714318615069.json";
 import supabase from "../../supabase-client";
-const Logged = () => {
+const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
@@ -37,9 +37,9 @@ const Logged = () => {
         confirmButtonText: "Ok",
       });
     } else {
-      setSuccess("Logged in successfully");
+      setSuccess("login in successfully");
       Swal.fire({
-        text: "Successfully logged in",
+        text: "Successfully login in",
         icon: "success",
         confirmButtonText: "Ok",
       });
@@ -101,4 +101,4 @@ const Logged = () => {
   );
 };
 
-export default Logged;
+export default Login;
