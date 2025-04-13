@@ -1,38 +1,42 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 import supabase from "../../supabase-client";
+
 const AddCraft = () => {
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+  const [qrFile, setQrFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [qrPreview, setQrPreview] = useState(null);
 
-  // Handle File Selection
-  const handleFileChange = (e) => {
+  const handleFileChange = (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file)); // Show preview before upload
+    if (type === "image") {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      setQrFile(file);
+      setQrPreview(URL.createObjectURL(file));
+    }
   };
 
-  // Handle Form Submission
   const handleAdd = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const form = e.target;
-
     const title = form.title.value;
     const description = form.description.value;
-    const price = form.description.price;
+    const price = form.price.value;
     const artist = form.artist.value;
-    const stockStatus = true;
     const year = form.year.value;
+    const stockStatus = true;
 
-    // Ensure an image is selected
-    if (!imageFile) {
+    if (!imageFile || !qrFile) {
       Swal.fire({
-        text: "Please select an image",
+        text: "Please select both art image and QR code image",
         icon: "warning",
         confirmButtonText: "Ok",
       });
@@ -40,27 +44,32 @@ const AddCraft = () => {
       return;
     }
 
+    // Upload image and qr
     let imageUrl = "";
+    let qrUrl = "";
+
     try {
-      const fileName = `${Date.now()}-${imageFile.name}`;
-      const { error } = await supabase.storage
-        .from("art-images")
-        .upload(fileName, imageFile, {
-          cacheControl: "3600",
-          upsert: false, // Prevent overwriting existing files
-          contentType: imageFile.type, // Ensure correct file type
-        });
+      const uploadFile = async (file, folder = "art-images") => {
+        const fileName = `${Date.now()}-${file.name}`;
+        const { error } = await supabase.storage
+          .from(folder)
+          .upload(fileName, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type,
+          });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      // Get Public URL
-      const { data: imageData } = supabase.storage
-        .from("art-images")
-        .getPublicUrl(fileName);
-      imageUrl = imageData.publicUrl;
+        const { data } = supabase.storage.from(folder).getPublicUrl(fileName);
+        return data.publicUrl;
+      };
+
+      imageUrl = await uploadFile(imageFile);
+      qrUrl = await uploadFile(qrFile);
     } catch (error) {
       Swal.fire({
-        text: "Image upload failed",
+        text: "Image or QR code upload failed",
         icon: "error",
         confirmButtonText: "Ok",
       });
@@ -75,11 +84,11 @@ const AddCraft = () => {
       description,
       price,
       image: imageUrl,
+      qr_code: qrUrl,
       artist,
       year,
     };
 
-    // Insert into Supabase
     const { error } = await supabase.from("ArtList").insert([newArt]);
 
     if (error) {
@@ -97,7 +106,9 @@ const AddCraft = () => {
       });
       form.reset();
       setImageFile(null);
+      setQrFile(null);
       setImagePreview(null);
+      setQrPreview(null);
     }
 
     setLoading(false);
@@ -109,7 +120,7 @@ const AddCraft = () => {
         <div className="card shrink-0 w-full shadow-2xl bg-base-100 border-2 border-[#eb9b40]">
           <form onSubmit={handleAdd} className="card-body">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {/* Left Side */}
+              {/* Left */}
               <div>
                 <div className="form-control">
                   <label className="label">
@@ -118,7 +129,6 @@ const AddCraft = () => {
                   <input
                     type="text"
                     name="title"
-                    placeholder="Title"
                     className="input input-bordered"
                     required
                   />
@@ -133,7 +143,6 @@ const AddCraft = () => {
                   <input
                     type="text"
                     name="description"
-                    placeholder="Description"
                     className="input input-bordered"
                     required
                   />
@@ -146,14 +155,38 @@ const AddCraft = () => {
                   <input
                     type="text"
                     name="price"
-                    placeholder="Price"
                     className="input input-bordered"
                     required
                   />
                 </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">
+                      Upload QR Code
+                    </span>
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="file-input file-input-bordered w-full"
+                    onChange={(e) => handleFileChange(e, "qr")}
+                    required
+                  />
+                  {qrPreview && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600">QR Preview:</p>
+                      <img
+                        src={qrPreview}
+                        alt="QR Preview"
+                        className="w-full h-32 object-contain mt-2"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Right Side */}
+              {/* Right */}
               <div>
                 <div className="form-control">
                   <label className="label">
@@ -162,7 +195,6 @@ const AddCraft = () => {
                   <input
                     type="text"
                     name="artist"
-                    placeholder="Artist"
                     className="input input-bordered"
                     required
                   />
@@ -175,7 +207,6 @@ const AddCraft = () => {
                   <input
                     type="number"
                     name="year"
-                    placeholder="Year"
                     className="input input-bordered"
                     required
                   />
@@ -184,29 +215,27 @@ const AddCraft = () => {
                 <div className="form-control">
                   <label className="label">
                     <span className="label-text font-semibold">
-                      Upload Image
+                      Upload Art Image
                     </span>
                   </label>
                   <input
                     type="file"
                     accept="image/*"
                     className="file-input file-input-bordered w-full"
-                    onChange={handleFileChange}
+                    onChange={(e) => handleFileChange(e, "image")}
                     required
                   />
+                  {imagePreview && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600">Image Preview:</p>
+                      <img
+                        src={imagePreview}
+                        alt="Image Preview"
+                        className="w-full h-40 object-cover mt-2"
+                      />
+                    </div>
+                  )}
                 </div>
-
-                {/* Image Preview */}
-                {imagePreview && (
-                  <div className="mt-4">
-                    <p className="text-sm text-gray-600">Image Preview:</p>
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-40 object-cover rounded-lg border-2 mt-2"
-                    />
-                  </div>
-                )}
               </div>
             </div>
 

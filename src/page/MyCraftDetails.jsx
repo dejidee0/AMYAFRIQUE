@@ -12,10 +12,13 @@ const MyCraftDetails = () => {
     year: "",
     artist: "",
     image: "",
+    qrCode: "", // Added qrCode state for the QR code image
   });
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+  const [imageFile2, setImageFile2] = useState(null); // Image file for QR code
   const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreview2, setImagePreview2] = useState(null); // Preview for QR code
 
   useEffect(() => {
     const fetchCraftDetails = async () => {
@@ -35,8 +38,10 @@ const MyCraftDetails = () => {
           year: data.year || "",
           artist: data.artist || "",
           image: data.image || "",
+          qrCode: data.qrCode || "", // Fetch the QR code image URL
         });
         setImagePreview(data.image);
+        setImagePreview2(data.qrCode); // Set the preview for QR code
       }
     };
 
@@ -48,6 +53,13 @@ const MyCraftDetails = () => {
     if (!file) return;
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleFileChange2 = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageFile2(file);
+    setImagePreview2(URL.createObjectURL(file)); // Set QR code preview
   };
 
   const handleChange = (e) => {
@@ -91,6 +103,33 @@ const MyCraftDetails = () => {
       }
     }
 
+    if (imageFile2) {
+      // Upload QR code if selected
+      try {
+        const qrCodeFileName = `${Date.now()}-${imageFile2.name}`;
+        const { error } = await supabase.storage
+          .from("qr-codes")
+          .upload(qrCodeFileName, imageFile2, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: imageFile2.type,
+          });
+
+        if (error) throw error;
+
+        const { data: qrCodeData } = supabase.storage
+          .from("qr-codes")
+          .getPublicUrl(qrCodeFileName);
+
+        updatedCraft.qrCode = qrCodeData.publicUrl; // Save QR code URL
+      } catch (error) {
+        Swal.fire("QR code upload failed", "", "error");
+        console.error(error);
+        setLoading(false);
+        return;
+      }
+    }
+
     const craftId = parseInt(id, 10);
     const { data: existingData, error: selectError } = await supabase
       .from("ArtList")
@@ -102,8 +141,6 @@ const MyCraftDetails = () => {
       setLoading(false);
       return;
     }
-    console.log("Updating craft with ID:", craftId);
-    console.log("Updated craft data:", updatedCraft);
 
     const { data, error } = await supabase
       .from("ArtList")
@@ -206,7 +243,7 @@ const MyCraftDetails = () => {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Upload Image</span>
+                <span className="label-text font-semibold">Update Image</span>
               </label>
               <input
                 type="file"
@@ -216,12 +253,35 @@ const MyCraftDetails = () => {
               />
             </div>
 
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">Update QR Code</span>
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                className="file-input file-input-bordered w-full"
+                onChange={handleFileChange2}
+              />
+            </div>
+
             {imagePreview && (
               <div className="mt-4">
                 <p className="text-sm text-gray-600">Image Preview:</p>
                 <img
                   src={imagePreview}
                   alt="Preview"
+                  className="w-full h-96 object-cover rounded-lg border-2 mt-2"
+                />
+              </div>
+            )}
+
+            {imagePreview2 && (
+              <div className="mt-4">
+                <p className="text-sm text-gray-600">QR Code Preview:</p>
+                <img
+                  src={imagePreview2}
+                  alt="QR Code Preview"
                   className="w-full h-96 object-cover rounded-lg border-2 mt-2"
                 />
               </div>
