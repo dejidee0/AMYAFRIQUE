@@ -8,7 +8,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { motion } from "framer-motion";
 import MagnifyView from "../component/MagnifyView";
 import { useNavigate } from "react-router-dom";
-
 import useAuthStore from "../store/authStore";
 
 const ViewDetails = () => {
@@ -43,6 +42,7 @@ const ViewDetails = () => {
       setLoading(false);
     }
   }, [id]);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -169,6 +169,17 @@ const ViewDetails = () => {
                 {views.description}
               </p>
             </div>
+
+            {/* QR Code Section */}
+            {views?.qrCode && (
+              <div className="flex justify-center mb-8">
+                <img
+                  src={views.qrCode} // Assuming QR code image URL is stored in `views.qrCode`
+                  alt="QR Code"
+                  className="w-32 h-32 object-contain border-2 border-gray-300 rounded-lg"
+                />
+              </div>
+            )}
 
             <div className="flex flex-col md:flex-row gap-4">
               {views.stockStatus ? (
