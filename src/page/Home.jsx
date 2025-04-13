@@ -94,7 +94,7 @@ As a major force in the art world, Amarachi Okpara is committed to fostering cre
 };
 
 /** Helper Component: Section Titles */
-export const SectionTitle = ({ title }) => (
+const SectionTitle = ({ title }) => (
   <>
     <hr className="mt-20 border-2 border-[#eb9b40] w-1/2 mx-auto" />
     <h2 className="text-center text-[#eb9b40] font-bold text-3xl sm:text-5xl mt-10">

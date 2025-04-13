@@ -5,7 +5,14 @@ import supabase from "../../supabase-client";
 
 const MyCraftDetails = () => {
   const { id } = useParams();
-  const [craft, setCraft] = useState({});
+  const [craft, setCraft] = useState({
+    title: "",
+    description: "",
+    price: "",
+    year: "",
+    artist: "",
+    image: "",
+  });
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -15,46 +22,49 @@ const MyCraftDetails = () => {
       const { data, error } = await supabase
         .from("ArtList")
         .select("*")
-        .eq("id", id)
+        .eq("id", parseInt(id))
         .single();
 
       if (error) {
         console.error("Error fetching craft details:", error);
       } else {
-        setCraft(data);
-
-        setImagePreview(data.image); // Set existing image as preview
+        setCraft({
+          title: data.title || "",
+          description: data.description || "",
+          price: data.price || "",
+          year: data.year || "",
+          artist: data.artist || "",
+          image: data.image || "",
+        });
+        setImagePreview(data.image);
       }
     };
 
     fetchCraftDetails();
   }, [id]);
 
-  // Handle image file selection
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setImageFile(file);
-    setImagePreview(URL.createObjectURL(file)); // Show preview before upload
+    setImagePreview(URL.createObjectURL(file));
   };
 
-  // Handle form submission (update)
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCraft((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleUpdate = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const form = e.target;
     const updatedCraft = {
-      item_name: form.itemName.value,
-
-      short_description: form.shortDes.value,
-      price: form.price.value,
-      year: form.status.year,
-      artist: form.status.value,
+      ...craft,
+      price: parseFloat(craft.price),
+      year: parseInt(craft.year, 10),
     };
 
-    // Upload image if a new one is selected
     if (imageFile) {
       try {
         const fileName = `${Date.now()}-${imageFile.name}`;
@@ -68,42 +78,44 @@ const MyCraftDetails = () => {
 
         if (error) throw error;
 
-        // Get the public URL
         const { data: imageData } = supabase.storage
           .from("art-images")
           .getPublicUrl(fileName);
+
         updatedCraft.image = imageData.publicUrl;
       } catch (error) {
-        Swal.fire({
-          text: "Image upload failed",
-          icon: "error",
-          confirmButtonText: "Ok",
-        });
+        Swal.fire("Image upload failed", "", "error");
         console.error(error);
         setLoading(false);
         return;
       }
     }
 
-    // Update the record in Supabase
-    const { error } = await supabase
+    const craftId = parseInt(id, 10);
+    const { data: existingData, error: selectError } = await supabase
+      .from("ArtList")
+      .select("*")
+      .eq("id", craftId);
+
+    if (selectError || !existingData?.length) {
+      Swal.fire("Error fetching item", "", "error");
+      setLoading(false);
+      return;
+    }
+    console.log("Updating craft with ID:", craftId);
+    console.log("Updated craft data:", updatedCraft);
+
+    const { data, error } = await supabase
       .from("ArtList")
       .update(updatedCraft)
-      .eq("id", id);
+      .eq("id", craftId)
+      .select();
 
     if (error) {
-      Swal.fire({
-        text: "Failed to update item",
-        icon: "error",
-        confirmButtonText: "Ok",
-      });
-      console.error(error);
+      Swal.fire("Update failed", error.message, "error");
     } else {
-      Swal.fire({
-        text: "Updated item successfully",
-        icon: "success",
-        confirmButtonText: "Ok",
-      });
+      Swal.fire("Updated!", "Item updated successfully", "success");
+      console.log("Updated data:", data);
     }
 
     setLoading(false);
@@ -115,29 +127,16 @@ const MyCraftDetails = () => {
         <div className="card shrink-0 w-full shadow-2xl bg-base-100 border-2 border-[#eb9b40]">
           <form onSubmit={handleUpdate} className="card-body">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {/* Left Side */}
               <div>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text font-semibold">Item Name</span>
+                    <span className="label-text font-semibold">Title</span>
                   </label>
                   <input
                     type="text"
-                    name="itemName"
-                    defaultValue={craft.title}
-                    className="input input-bordered"
-                    required
-                  />
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-semibold">Category</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="subName"
-                    defaultValue={craft.category}
+                    name="title"
+                    value={craft.title}
+                    onChange={handleChange}
                     className="input input-bordered"
                     required
                   />
@@ -151,15 +150,15 @@ const MyCraftDetails = () => {
                   </label>
                   <input
                     type="text"
-                    name="shortDes"
-                    defaultValue={craft.description}
+                    name="description"
+                    value={craft.description}
+                    onChange={handleChange}
                     className="input input-bordered"
                     required
                   />
                 </div>
               </div>
 
-              {/* Right Side */}
               <div>
                 <div className="form-control">
                   <label className="label">
@@ -167,20 +166,23 @@ const MyCraftDetails = () => {
                   </label>
                   <input
                     type="text"
-                    name="status"
-                    defaultValue={craft.artist}
+                    name="artist"
+                    value={craft.artist}
+                    onChange={handleChange}
                     className="input input-bordered"
                     required
                   />
                 </div>
+
                 <div className="form-control">
                   <label className="label">
                     <span className="label-text font-semibold">Year</span>
                   </label>
                   <input
-                    type="text"
-                    name="status"
-                    defaultValue={craft.year}
+                    type="number"
+                    name="year"
+                    value={craft.year}
+                    onChange={handleChange}
                     className="input input-bordered"
                     required
                   />
@@ -191,9 +193,10 @@ const MyCraftDetails = () => {
                     <span className="label-text font-semibold">Price</span>
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     name="price"
-                    defaultValue={craft.price}
+                    value={craft.price}
+                    onChange={handleChange}
                     className="input input-bordered"
                     required
                   />
@@ -201,7 +204,6 @@ const MyCraftDetails = () => {
               </div>
             </div>
 
-            {/* Image Upload */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-semibold">Upload Image</span>
@@ -214,7 +216,6 @@ const MyCraftDetails = () => {
               />
             </div>
 
-            {/* Image Preview */}
             {imagePreview && (
               <div className="mt-4">
                 <p className="text-sm text-gray-600">Image Preview:</p>

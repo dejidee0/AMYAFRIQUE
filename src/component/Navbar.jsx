@@ -63,6 +63,11 @@ const Navbar = () => {
           Add Art Item
         </NavLink>
       )}
+      {user?.email === "dnlcodes4@gmail.com" && (
+        <NavLink to={"/myCraft"} className={"text-[#eb9b40] font-extrabold"}>
+          My Craft
+        </NavLink>
+      )}
 
       {user?.email === "dnlcodes4@gmail.com" && (
         <NavLink to={"/addCraft"} className={"text-[#eb9b40] font-extrabold"}>
