@@ -15,7 +15,7 @@ import SubCategory from "../page/SubCategory";
 import Test from "../page/Test";
 import About from "../page/About";
 import Events from "../page/Events";
-import PaymentCallback from "../page/PaymentCallback";
+import PaymentSuccess from "../page/PaymentSucess";
 
 const router = createBrowserRouter([
   {
@@ -92,8 +92,8 @@ const router = createBrowserRouter([
         element: <Test></Test>,
       },
       {
-        path: "/paymentCallback",
-        element: <PaymentCallback />,
+        path: "/payment-success",
+        element: <PaymentSuccess />,
       },
     ],
   },

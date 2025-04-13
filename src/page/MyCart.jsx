@@ -2,13 +2,12 @@ import { useCartStore } from "../store/cartStore";
 import { FaTimes, FaLock, FaOpencart } from "react-icons/fa";
 import { Slide, Fade } from "react-awesome-reveal";
 import useAuthStore from "../store/authStore";
-import { createPaymentLink, verifyPayment } from "../services/paystackService"; // Import the services
+
 import { useState } from "react";
 
 const MyCart = () => {
   const cartItems = useCartStore((state) => state.cartItems) || [];
   const removeFromCart = useCartStore((state) => state.removeFromCart);
-  const [paymentLink, setPaymentLink] = useState("");
   const [loading, setLoading] = useState(false);
 
   const getTotal = useCartStore((state) => state.getTotal);
@@ -17,39 +16,45 @@ const MyCart = () => {
   const handlePayment = async () => {
     setLoading(true);
     try {
-      // Replace with actual amount and user's email
-      const amount = 5000; // Example amount
-      const email = user.email; // Example email
+      const amount = getTotal() * 1000; // in Kobo
+      const email = user.email;
 
-      // Call the backend to create a Paystack payment link
-      const link = await createPaymentLink(amount, email);
+      const response = await fetch("/api/createPayment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, amount }),
+      });
 
-      // Set the link to be used for redirecting
-      setPaymentLink(link);
+      const data = await response.json();
 
-      // Redirect user to Paystack for payment
-      window.location.href = link;
-    } catch (error) {
-      console.error("Error initializing payment:", error);
-      setLoading(false);
-      // Handle the error (show a message to the user)
-    }
-  };
-
-  const handleVerifyPayment = async (reference) => {
-    try {
-      const result = await verifyPayment(reference);
-      console.log("Payment Verification Result:", result);
-
-      if (result.paymentData.status === "success") {
-        // Handle successful payment (e.g., show a success message, update order status)
+      if (data.authorization_url) {
+        window.location.href = data.authorization_url;
       } else {
-        // Handle failed payment (e.g., show an error message)
+        console.error("Failed to create payment link:", data);
+        alert("Failed to initiate payment. Please try again.");
+        setLoading(false);
       }
     } catch (error) {
-      console.error("Error verifying payment:", error);
+      console.error("Error initializing payment:", error);
+      alert("Something went wrong. Please try again later.");
+      setLoading(false);
     }
   };
+
+  // const handleVerifyPayment = async (reference) => {
+  //   try {
+  //     const result = await verifyPayment(reference);
+  //     console.log("Payment Verification Result:", result);
+
+  //     if (result.paymentData.status === "success") {
+  //       // Handle successful payment (e.g., show a success message, update order status)
+  //     } else {
+  //       // Handle failed payment (e.g., show an error message)
+  //     }
+  //   } catch (error) {
+  //     console.error("Error verifying payment:", error);
+  //   }
+  // };
 
   return (
     <Fade triggerOnce duration={500}>
@@ -129,10 +134,15 @@ const MyCart = () => {
             </div>
             <button
               onClick={handlePayment}
-              className="w-full mt-8 bg-[#eb9b40] hover:bg-[#d18a38] text-white py-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2"
+              disabled={loading}
+              className={`w-full mt-8 py-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                loading
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-[#eb9b40] hover:bg-[#d18a38] text-white"
+              }`}
             >
               <FaLock className="text-sm" />
-              Proceed to Checkout
+              {loading ? "Processing..." : "Proceed to Checkout"}
             </button>
           </div>
         </Slide>
