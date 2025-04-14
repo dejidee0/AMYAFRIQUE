@@ -176,7 +176,7 @@ const ViewDetails = () => {
                 <img
                   src={views.qrCode} // Assuming QR code image URL is stored in `views.qrCode`
                   alt="QR Code"
-                  className="w-32 h-32 object-contain border-2 border-gray-300 rounded-lg"
+                  className="w-52 h-52 object-contain border-2 border-gray-300 rounded-lg"
                 />
               </div>
             )}
