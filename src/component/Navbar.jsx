@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import logo from ".././assets/logo.png";
+import logo from "../../public/logo.png";
 import { useEffect, useState } from "react";
 
 import supabase from "../../supabase-client";

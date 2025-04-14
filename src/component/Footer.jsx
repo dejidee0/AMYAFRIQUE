@@ -1,6 +1,6 @@
 import { Flip } from "react-awesome-reveal";
 import { FaFacebook, FaGithub, FaTwitter } from "react-icons/fa6";
-import logo from "../assets/logo.png";
+import logo from "../../public/logo.png";
 
 const Footer = () => {
   return (
