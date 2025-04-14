@@ -1,7 +1,7 @@
 import axios from "axios";
 import supabase from "../supabase-client.js"; // Import Supabase client
 
-const PAYSTACK_SECRET_KEY = "sk_test_d85193414f0f8e7b2b95f67b1dacba68dfddef2e";
+const PAYSTACK_SECRET_KEY = "sk_test_d505ec4e544823011605f841b514a36926a6e3c6";
 // Function to create a payment link
 const createPaymentLink = async (req, res) => {
   const { amount, email } = req.body;

@@ -28,7 +28,7 @@ const About = () => {
         <div className="text-center sm:text-left max-w-3xl px-6 sm:px-0 md:py-8">
           <Slide direction="left" delay={200}>
             <h1 className="text-[#eb9b40] font-bold text-3xl sm:text-4xl mb-6 font-greatvibes sm:py-3">
-              The Artist behind the Artistry
+              The Gallerist behind the Artistry
             </h1>
           </Slide>
 

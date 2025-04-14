@@ -5,7 +5,7 @@ import Slider from "../component/Slider";
 
 import supabase from "../../supabase-client";
 
-import Amara from "../assets/amara.jpg";
+import Amara from "../../public/image1.jpg";
 import wooden from "../assets/wooden.jpg";
 import nature from "../assets/nature.jpg";
 

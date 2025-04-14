@@ -62,26 +62,26 @@ const MyCraft = () => {
                   <img
                     src={item.image}
                     className="rounded-lg shadow-2xl w-max max-h-[500px] object-contain"
-                    alt={item.item_name}
+                    alt={item.title}
                   />
                 </div>
                 <div className="w-full lg:w-1/2">
-                  <h1 className="text-5xl font-bold">{item.item_name}</h1>
+                  <h1 className="text-5xl font-bold">{item.title}</h1>
                   <div className="py-2 flex flex-row gap-3">
                     <p className="font-bold">Price:</p>
                     <p>{item.price}</p>
                   </div>
                   <div className="py-2 flex flex-row gap-3">
-                    <p className="font-bold">Rating:</p>
-                    <p>{item.rating}</p>
+                    <p className="font-bold">Artist:</p>
+                    <p>{item.artist}</p>
                   </div>
                   <div className="py-2 flex flex-row gap-3">
-                    <p className="font-bold">Customization:</p>
-                    <p>{item.customization}</p>
+                    <p className="font-bold">Year:</p>
+                    <p>{item.year}</p>
                   </div>
                   <div className="py-2 flex flex-row gap-3">
                     <p className="font-bold">Stock Status:</p>
-                    <p>{item.stockStatus}</p>
+                    <p>{item.stockStatus && <p>Availale</p>}</p>
                   </div>
                   <div className="flex flex-row gap-10">
                     <Link to={`/craftDe/${item.id}`}>
