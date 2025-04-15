@@ -35,7 +35,17 @@
     <link rel="canonical" href="https://amyafrique.com/" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <svg className="hidden">
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </svg>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
 
     <!-- Paystack Payment Integration -->

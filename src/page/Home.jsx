@@ -2,18 +2,29 @@ import { Link } from "react-router-dom";
 import { Fade, Slide } from "react-awesome-reveal";
 import { useEffect, useState } from "react";
 import Slider from "../component/Slider";
-
 import supabase from "../../supabase-client";
+import confetti from "canvas-confetti";
 
 import Amara from "../../public/image1.jpg";
 import wooden from "../assets/wooden.jpg";
 import nature from "../assets/nature.jpg";
 
+import WelcomeModal from "../component/WelcomeModal";
+
 const Home = () => {
   const [allArt, setAllArt] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
+    // Check for first time visit
+    const hasSeenWelcome = sessionStorage.getItem("hasSeenWelcome");
+
+    if (!hasSeenWelcome) {
+      setShowWelcome(true);
+      sessionStorage.setItem("hasSeenWelcome", "true");
+    }
+    // Fetch data from Supabase
     const fetchData = async () => {
       const { data, error } = await supabase.from("ArtList").select("*");
       if (error) console.log(error);
@@ -22,15 +33,26 @@ const Home = () => {
     };
     fetchData();
   }, []);
+  useEffect(() => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      zIndex: 99999,
+    });
+  }, []);
 
   return (
-    <div className=" min-h-screen text-gray-900">
+    <div className="relative min-h-screen text-gray-900">
       {/* Loading Spinner */}
       {isLoading && (
         <div className="flex justify-center items-center h-screen">
           <span className="loading loading-spinner loading-lg text-[#eb9b40]"></span>
         </div>
       )}
+
+      {/* Welcome Popup */}
+      {showWelcome && <WelcomeModal />}
 
       {/* Hero Section - Slider */}
       <div className="mt-10">
@@ -82,11 +104,8 @@ const Home = () => {
         image={Amara}
         title="Amarachi Okpara – The Art Specialist"
         description="
-
 Amarachi Okpara is a renowned artist specialist, celebrated for her expertise in curating, evaluating, and promoting exceptional artworks. With years of experience in the art industry, she has established herself as a leading figure, connecting collectors, galleries, and artists with some of the most sought-after pieces in the market.
-
 Her keen eye for artistic excellence, deep knowledge of art history, and strong market influence make her a trusted name in the industry. Whether working with emerging artists or well-established creators, Amarachi is dedicated to elevating artistic talent and ensuring that every piece she represents holds significant value.
-
 As a major force in the art world, Amarachi Okpara is committed to fostering creativity, expanding the reach of fine art, and providing expert guidance to clients seeking rare and extraordinary works. Her passion for art and dedication to excellence continue to shape the industry, making her a true specialist in her field."
       />
     </div>
