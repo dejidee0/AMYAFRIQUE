@@ -6,6 +6,20 @@ export default {
       fontFamily: {
         greatvibes: ["Great Vibes", "cursive"],
       },
+      animation: {
+        fadeIn: "fadeIn 0.5s ease-in-out",
+        "pulse-ring": "pulse-ring 1s ease-out infinite",
+      },
+      keyframes: {
+        "pulse-ring": {
+          "0%": { transform: "scale(1)", opacity: 1 },
+          "100%": { transform: "scale(1.5)", opacity: 0 },
+        },
+        fadeIn: {
+          "0%": { opacity: 0, transform: "translateY(10px)" },
+          "100%": { opacity: 1, transform: "translateY(0)" },
+        },
+      },
     },
   },
   plugins: [require("daisyui")],
