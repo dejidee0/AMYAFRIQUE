@@ -39,40 +39,37 @@ const createPaymentLink = async (req, res) => {
 const verifyPayment = async (req, res) => {
   const { reference } = req.query;
 
+  console.log("Received reference:", reference);
+
   try {
     const response = await axios.get(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
         headers: {
-          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
         },
       }
     );
 
     const paymentData = response.data.data;
+    console.log("Payment data from Paystack:", paymentData);
 
     if (paymentData.status !== "success") {
-      return res
-        .status(400)
-        .json({
-          message: "Payment not successful",
-          paymentStatus: paymentData.status,
-        });
+      return res.status(400).json({
+        message: "Payment not successful",
+        paymentStatus: paymentData.status,
+      });
     }
 
-    // Log customer details
-    console.log("Payment data:", paymentData);
-
-    const { email } = paymentData.customer ?? {};
-    if (!email) {
-      return res
-        .status(400)
-        .json({ message: "No customer email found in payment data." });
+    const customerEmail = paymentData.customer?.email;
+    if (!customerEmail) {
+      console.error("No customer email found");
+      return res.status(400).json({ message: "Customer email missing" });
     }
 
     const { error } = await supabase.from("payments").insert([
       {
-        user_id: email,
+        user_id: customerEmail,
         reference: paymentData.reference,
         amount: paymentData.amount / 100,
         status: paymentData.status,
@@ -85,13 +82,11 @@ const verifyPayment = async (req, res) => {
       return res.status(500).json({ message: "Supabase insert failed", error });
     }
 
-    return res.status(200).json({
-      message: "Payment verified successfully",
-    });
+    return res.status(200).json({ message: "Payment verified successfully" });
   } catch (error) {
     console.error(
-      "Payment verification error:",
-      error?.response?.data || error
+      "Unexpected error:",
+      error?.response?.data || error.message || error
     );
     return res
       .status(500)
