@@ -44,7 +44,7 @@ const Footer = () => {
         <p className="text-white text-sm md:text-base font-semibold">
           Made with <span className="text-red-600 text-lg">❤️</span> by{" "}
           <a
-            href="https://www.instagram.com/codemonk.dev"
+            href="https://www.instagram.com/__techbro.mike"
             target="_blank"
             rel="noopener noreferrer"
             className="underline underline-offset-2 hover:text-black transition"
