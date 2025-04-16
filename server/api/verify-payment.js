@@ -1,5 +1,5 @@
 import axios from "axios";
-import supabase from "../../supabase-client";
+import supabase from "../supabase-client.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {

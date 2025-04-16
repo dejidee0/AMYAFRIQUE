@@ -1,9 +1,8 @@
 // api/create-payment.js
-import paystack from "paystack";
-import supabase from "../../supabase-client";
-const { PAYSTACK_SECRET_KEY } = process.env;
+import fetch from "node-fetch"; // Only if Node < 18
+import supabase from "../supabase-client.js";
 
-const paystackClient = paystack(PAYSTACK_SECRET_KEY);
+const { PAYSTACK_SECRET_KEY } = process.env;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -13,15 +12,28 @@ export default async function handler(req, res) {
   try {
     const { email, amount, metadata } = req.body;
 
-    // Create Paystack payment
-    const payment = await paystackClient.transaction.initialize({
-      email,
-      amount: amount * 100, // Convert to kobo
-      metadata,
-      callback_url: `${req.headers.origin}/api/verify-payment`,
-    });
+    const response = await fetch(
+      "https://api.paystack.co/transaction/initialize",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          amount: amount * 100,
+          metadata,
+          callback_url: `${req.headers.origin}/api/verify-payment`,
+        }),
+      }
+    );
 
-    // Store initial payment in Supabase
+    const payment = await response.json();
+
+    if (!payment.status)
+      throw new Error(payment.message || "Payment init failed");
+
     const { error } = await supabase.from("payments").insert({
       reference: payment.data.reference,
       email,
