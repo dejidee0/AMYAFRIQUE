@@ -20,7 +20,7 @@ app.post("/api/create-payment-link", createPaymentLink);
 app.get("/api/verify-payment", verifyPayment); // use GET because reference is sent in query string
 
 app.get("/", (req, res) => {
-  res.send("Art website backend is live!");
+  res.send("Amy Afrique is Ready to serve!");
 });
 
 // Start the server

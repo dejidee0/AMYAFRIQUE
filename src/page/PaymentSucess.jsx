@@ -15,7 +15,12 @@ const PaymentSuccess = () => {
       if (!reference) return;
 
       try {
-        const res = await fetch(`/api/verify-payment?reference=${reference}`);
+        const res = await fetch(
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/verify-payment?reference=${reference}`
+        );
+
         const data = await res.json();
 
         if (res.ok && data.paymentData) {
