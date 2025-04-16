@@ -1,5 +1,4 @@
 import axios from "axios";
-import supabase from "../supabase-client.js"; // Adjust if your Supabase file is elsewhere
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
@@ -67,20 +66,7 @@ const verifyPayment = async (req, res) => {
       return res.status(400).json({ message: "Customer email missing" });
     }
 
-    const { error } = await supabase.from("payments").insert([
-      {
-        user_id: customerEmail,
-        reference: paymentData.reference,
-        amount: paymentData.amount / 100,
-        status: paymentData.status,
-        metadata: paymentData.metadata,
-      },
-    ]);
-
-    if (error) {
-      console.error("Supabase insert error:", error);
-      return res.status(500).json({ message: "Supabase insert failed", error });
-    }
+    // Removed Supabase insert logic
 
     return res.status(200).json({ message: "Payment verified successfully" });
   } catch (error) {
