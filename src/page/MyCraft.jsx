@@ -69,7 +69,7 @@ const MyCraft = () => {
                   <h1 className="text-5xl font-bold">{item.title}</h1>
                   <div className="py-2 flex flex-row gap-3">
                     <p className="font-bold">Price:</p>
-                    <p>{item.price}</p>
+                    <p>{(item.price * 1000).toLocaleString()}</p>
                   </div>
                   <div className="py-2 flex flex-row gap-3">
                     <p className="font-bold">Artist:</p>
