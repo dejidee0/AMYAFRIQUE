@@ -22,7 +22,7 @@ const PaymentSuccess = () => {
           setStatus("Payment Verified Successfully!");
           // You can navigate to another page or show a receipt
           setTimeout(() => {
-            navigate("/thank-you"); // Navigate to a thank-you page or home
+            navigate("/"); // Navigate to a thank-you page or home
           }, 2000);
         } else {
           setStatus("Payment Verification Failed.");

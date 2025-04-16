@@ -1,15 +1,17 @@
+// controllers/paystackController.js
 import axios from "axios";
-import supabase from "../supabase-client.js";
+import supabase from "../supabase-client.js"; // make sure this path is correct
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.server" });
 
-export default async function handler(req, res) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method Not Allowed" });
+export const verifyPayment = async (req, res) => {
+  const reference = req.query.reference;
+
+  if (!reference) {
+    return res.status(400).json({ message: "Reference is required" });
   }
 
-  const { reference } = req.query;
-
   try {
-    // Verify the Paystack payment
     const response = await axios.get(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
@@ -21,11 +23,10 @@ export default async function handler(req, res) {
 
     const paymentData = response.data.data;
 
-    // Check if the payment is successful
     if (paymentData.status === "success") {
       const { data, error } = await supabase.from("payments").insert([
         {
-          user_id: paymentData.customer.email, // or paymentData.email
+          user_id: paymentData.customer.email,
           amount: paymentData.amount / 100,
           status: paymentData.status,
           paystack_reference: paymentData.reference,
@@ -34,7 +35,7 @@ export default async function handler(req, res) {
       ]);
 
       if (error) {
-        console.error("Error storing payment data in Supabase:", error);
+        console.error("Supabase insert error:", error);
         return res
           .status(500)
           .json({ message: "Failed to store payment data" });
@@ -48,7 +49,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: "Payment verification failed" });
     }
   } catch (error) {
-    console.error("Error verifying payment:", error);
+    console.error("Error verifying payment:", error.message);
     return res.status(500).json({ message: "Payment verification failed" });
   }
-}
+};
