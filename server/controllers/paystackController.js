@@ -51,37 +51,51 @@ const verifyPayment = async (req, res) => {
 
     const paymentData = response.data.data;
 
-    if (paymentData.status === "success") {
-      const { data, error } = await supabase.from("payments").insert([
-        {
-          user_id: paymentData.customer.email, // Adjust according to your schema
-          amount: paymentData.amount / 100,
-          status: paymentData.status,
-          paystack_reference: paymentData.reference,
-          created_at: new Date(),
-        },
-      ]);
-
-      if (error) {
-        console.error("Supabase Insert Error:", error);
-        return res
-          .status(500)
-          .json({ message: "Failed to store payment data" });
-      }
-
-      return res.json({
-        message: "Payment verified successfully",
-        paymentData: data,
-      });
-    } else {
-      return res.status(400).json({ message: "Payment was not successful" });
+    if (paymentData.status !== "success") {
+      return res
+        .status(400)
+        .json({
+          message: "Payment not successful",
+          paymentStatus: paymentData.status,
+        });
     }
+
+    // Log customer details
+    console.log("Payment data:", paymentData);
+
+    const { email } = paymentData.customer ?? {};
+    if (!email) {
+      return res
+        .status(400)
+        .json({ message: "No customer email found in payment data." });
+    }
+
+    const { error } = await supabase.from("payments").insert([
+      {
+        user_id: email,
+        reference: paymentData.reference,
+        amount: paymentData.amount / 100,
+        status: paymentData.status,
+        metadata: paymentData.metadata,
+      },
+    ]);
+
+    if (error) {
+      console.error("Supabase insert error:", error);
+      return res.status(500).json({ message: "Supabase insert failed", error });
+    }
+
+    return res.status(200).json({
+      message: "Payment verified successfully",
+    });
   } catch (error) {
     console.error(
       "Payment verification error:",
       error?.response?.data || error
     );
-    res.status(500).json({ message: "Payment verification failed" });
+    return res
+      .status(500)
+      .json({ message: "Payment verification failed", error });
   }
 };
 
