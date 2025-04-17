@@ -1,12 +1,13 @@
 // pages/payment-success.jsx
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom"; // React Router v6 hooks
+import { useCartStore } from "../store/cartStore";
 
 const PaymentSuccess = () => {
   const location = useLocation(); // For accessing URL query params
   const navigate = useNavigate(); // For navigating after payment success
   const [status, setStatus] = useState("Verifying...");
-
+  const clearCart = useCartStore((state) => state.clearCart);
   // Extracting the reference from the URL query params
   const reference = new URLSearchParams(location.search).get("reference");
 
@@ -25,7 +26,7 @@ const PaymentSuccess = () => {
 
         if (res.ok && data.paymentData) {
           setStatus("Payment Verified Successfully!");
-          // You can navigate to another page or show a receipt
+          clearCart();
           setTimeout(() => {
             navigate("/"); // Navigate to a thank-you page or home
           }, 2000);
@@ -39,7 +40,7 @@ const PaymentSuccess = () => {
     };
 
     verify();
-  }, [reference, navigate]);
+  }, [reference, navigate, clearCart]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
