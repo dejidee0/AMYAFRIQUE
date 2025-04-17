@@ -45,7 +45,7 @@ const verifyPayment = async (req, res) => {
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
         },
       }
     );
@@ -68,7 +68,9 @@ const verifyPayment = async (req, res) => {
 
     // Removed Supabase insert logic
 
-    return res.status(200).json({ message: "Payment verified successfully" });
+    return res
+      .status(200)
+      .json({ message: "Payment verified successfully", paymentData });
   } catch (error) {
     console.error(
       "Unexpected error:",
