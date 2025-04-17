@@ -10,7 +10,7 @@ const Navbar = () => {
   const allowedEmails = [
     "amyafriquee@gmail.com",
     "dnlcodes4@gmail.com",
-    "thirdemail@example.com",
+    "ifemicheal2@gmail.com",
   ];
   useEffect(() => {
     // Check user session on mount
