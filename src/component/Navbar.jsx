@@ -7,7 +7,11 @@ import supabase from "../../supabase-client";
 const Navbar = () => {
   const [theme, setTheme] = useState("light");
   const [user, setUser] = useState(null); // Set to null initially
-
+  const allowedEmails = [
+    "amyafriquee@gmail.com",
+    "dnlcodes4@gmail.com",
+    "thirdemail@example.com",
+  ];
   useEffect(() => {
     // Check user session on mount
     const getUser = async () => {
@@ -59,13 +63,13 @@ const Navbar = () => {
         About Us
       </NavLink>
 
-      {user?.email === "dnlcodes4@gmail.com" && (
+      {allowedEmails.includes(user?.email) && (
         <NavLink to={"/myCraft"} className={"text-[#eb9b40] font-extrabold"}>
           My Craft
         </NavLink>
       )}
 
-      {user?.email === "dnlcodes4@gmail.com" && (
+      {allowedEmails.includes(user?.email) && (
         <NavLink to={"/addCraft"} className={"text-[#eb9b40] font-extrabold"}>
           Add Art Item
         </NavLink>
