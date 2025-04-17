@@ -29,7 +29,8 @@ const AddCraft = () => {
     const form = e.target;
     const title = form.title.value;
     const description = form.description.value;
-    const price = form.price.value;
+    const price = parseFloat(form.price.value) / 1000;
+
     const artist = form.artist.value;
     const year = form.year.value;
     const stockStatus = true;
@@ -84,7 +85,7 @@ const AddCraft = () => {
       description,
       price,
       image: imageUrl,
-      qr_code: qrUrl,
+      qrCode: qrUrl,
       artist,
       year,
     };

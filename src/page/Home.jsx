@@ -6,8 +6,8 @@ import supabase from "../../supabase-client";
 import confetti from "canvas-confetti";
 
 import Amara from "../../public/image1.jpg";
-import wooden from "../assets/wooden.jpg";
-import nature from "../assets/nature.jpg";
+import maracco from "../../public/Maracco.jpg";
+import beach from "../../public/beach.jpg";
 
 import WelcomeModal from "../component/WelcomeModal";
 
@@ -88,14 +88,15 @@ const Home = () => {
       {/* Section: The Art */}
       <SectionTitle title="The Art" />
       <ArtShowcase
-        image={wooden}
-        title="Starry Night Over the Rhône"
-        description="Starry Night Over the Rhône (1888) is the sister work of Starry Night (1889). While Starry Night was painted from Van Gogh’s hospital room, this lesser-known midnight depiction was actually painted on the bank of the Rhône river, a short walk from his home in Arles."
+        image={maracco}
+        title="MARCOCO IN PARADISE "
+        description="MARCOCO IN PARADISE speaks to a dreamlike journey—where reality and imagination collide. It embodies a surreal escape into serenity, blending cosmic elements with earthly calm. The layered textures and tropical backdrop offer a symbolic contrast: a quiet paradise anchored in deep reflection. Through the merging of traditional scenes with celestial beauty, I invite you to explore a place where inner peace meets universal wonder. This piece is a personal expression of longing—longing for calm amidst chaos, for beauty in forgotten places. MARCOCO IN PARADISE is not just a destination; it’s a mindset—an invitation to drift beyond the ordinary and rediscover paradise within."
       />
       <ArtShowcase
-        image={nature}
-        title="The Mona Lisa"
-        description="Mona Lisa, painted between 1503 and 1519 by Leonardo da Vinci, is one of the world’s most famous paintings. It now hangs in the Louvre Museum, Paris, where its mysterious smile and unproven identity continue to captivate art lovers worldwide."
+        image={beach}
+        title="THE BEACH"
+        description="
+A surreal fusion of ocean beauty and cosmic wonder, The Beach invites the viewer into a dreamscape where earthly serenity blends with celestial fantasy. The leaping dolphin beneath a galactic sky symbolizes harmony and freedom, while the vibrant colors of the sea and sunset evoke peace and imagination. This artwork transcends reality, offering a momentary escape into a world where nature and the universe dance together."
       />
 
       {/* Section: The Artist */}
