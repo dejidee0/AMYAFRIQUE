@@ -38,11 +38,6 @@ const createPaymentLink = async (req, res) => {
 const verifyPayment = async (req, res) => {
   let { reference, email, orderDetails } = req.query;
 
-  // ✅ Ensure values are strings
-  reference = reference?.toString();
-  email = email?.toString();
-  orderDetails = orderDetails?.toString();
-
   if (!reference || !email || !orderDetails) {
     return res
       .status(400)
@@ -50,6 +45,15 @@ const verifyPayment = async (req, res) => {
   }
 
   try {
+    // Decode URI component and parse order details
+    orderDetails = decodeURIComponent(orderDetails);
+    let parsedOrderDetails;
+    try {
+      parsedOrderDetails = JSON.parse(orderDetails);
+    } catch (parseError) {
+      return res.status(400).json({ error: "Invalid order details format" });
+    }
+
     const response = await axios.get(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
@@ -65,7 +69,7 @@ const verifyPayment = async (req, res) => {
       return res.status(400).json({ error: "Payment verification failed" });
     }
 
-    await sendOrderConfirmationEmail(email, JSON.parse(orderDetails));
+    await sendOrderConfirmationEmail(email, parsedOrderDetails);
 
     return res.status(200).json({
       message: "Payment verified successfully, email sent.",

@@ -16,21 +16,36 @@ const PaymentSuccess = () => {
       if (!reference) return;
 
       try {
+        // Retrieve order data from local storage
+        const orderData = JSON.parse(localStorage.getItem("orderData"));
+        if (!orderData) {
+          setStatus("Order data not found.");
+          return;
+        }
+
+        const { email, cartItems } = orderData;
+        const orderDetails = cartItems; // No need to stringify here, as we will send it in the body
+
+        // Verify payment using POST
         const res = await fetch(
-          `${
-            import.meta.env.VITE_BACKEND_URL
-          }/api/verify-payment?reference=${reference}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/verify-payment`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              reference,
+              email,
+              orderDetails,
+            }),
+          }
         );
 
-        const data = await res.json();
+        if (res.ok) {
+          const data = await res.json();
 
-        if (res.ok && data.paymentData) {
-          setStatus("Payment Verified Successfully!");
-
-          // Retrieve order data from local storage
-          const orderData = JSON.parse(localStorage.getItem("orderData"));
-
-          if (orderData) {
+          if (data.message === "Payment verified successfully, email sent.") {
             // Send order details to the business owner's email
             const emailResponse = await fetch(
               `${import.meta.env.VITE_BACKEND_URL}/api/send-order-email`,
@@ -54,14 +69,17 @@ const PaymentSuccess = () => {
             } else {
               console.error("Failed to send order details.");
             }
-          }
 
-          clearCart();
-          setTimeout(() => {
-            navigate("/"); // Navigate to a thank-you page or home
-          }, 2000);
+            // Clear cart and navigate
+            clearCart();
+            setTimeout(() => {
+              navigate("/thank-you"); // Navigate to a thank-you page or home
+            }, 2000);
+          } else {
+            setStatus("Payment verification failed.");
+          }
         } else {
-          setStatus("Payment Verification Failed.");
+          setStatus("Payment verification failed.");
         }
       } catch (err) {
         console.error("Error verifying payment:", err);
