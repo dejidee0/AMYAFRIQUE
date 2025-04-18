@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { FaCartPlus, FaCheckCircle } from "react-icons/fa";
 import { useCartStore } from "../store/cartStore";
 import { toast, ToastContainer } from "react-toastify";
@@ -7,17 +7,13 @@ import supabase from "../../supabase-client";
 import "react-toastify/dist/ReactToastify.css";
 import { motion } from "framer-motion";
 import MagnifyView from "../component/MagnifyView";
-import { useNavigate } from "react-router-dom";
-import useAuthStore from "../store/authStore";
 
 const ViewDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate(); // 👈 add this
-  const user = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
 
   const [views, setViews] = useState(null);
   const [magnifyView, setMagnifyView] = useState(false);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -48,13 +44,6 @@ const ViewDetails = () => {
   }, [fetchData]);
 
   const handleAddToCart = () => {
-    if (!user) {
-      toast.info("Please log in to add items to your cart", {
-        autoClose: 2000,
-      });
-      navigate("/login"); // 👈 redirect to login
-      return;
-    }
     addToCart(views);
     toast.success(`${views.title} added to cart`, { autoClose: 2000 });
   };
@@ -170,11 +159,10 @@ const ViewDetails = () => {
               </p>
             </div>
 
-            {/* QR Code Section */}
             {views?.qrCode && (
               <div className="flex justify-center mb-8">
                 <img
-                  src={views.qrCode} // Assuming QR code image URL is stored in `views.qrCode`
+                  src={views.qrCode}
                   alt="QR Code"
                   className="w-52 h-52 object-contain border-2 border-gray-300 rounded-lg"
                 />
@@ -222,7 +210,6 @@ const ViewDetails = () => {
         </div>
       </div>
 
-      {/* Magnify Modal */}
       {magnifyView && (
         <MagnifyView
           image={views.image}

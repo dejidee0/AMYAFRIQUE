@@ -1,36 +1,46 @@
 import { useState } from "react";
+import { FaOpencart, FaTimes, FaCartPlus } from "react-icons/fa";
+import Slide from "react-reveal/Slide";
+import Fade from "react-reveal/Fade";
+import DeliveryForm from "../component/DeliveryForm";
 import { useCartStore } from "../store/cartStore";
-import useAuthStore from "../store/authStore";
-import {
-  createPaymentLink,
-  verifyPayment,
-} from "../../services/paystackService";
-import { FaTimes, FaLock, FaOpencart } from "react-icons/fa";
-import { Slide, Fade } from "react-awesome-reveal";
+import { createPaymentLink } from "../../services/paystackService";
 
-const MyCart = () => {
+const CartPage = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isFormComplete, setIsFormComplete] = useState(false); // Track if form is complete
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState(""); // Store the email from the form
   const cartItems = useCartStore((state) => state.cartItems) || [];
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const getTotal = useCartStore((state) => state.getTotal);
-  const user = useAuthStore((state) => state.user);
-
   const [paymentLink, setPaymentLink] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const errorMessage = ""; // Replace with error handling logic
 
   const handlePayment = async () => {
     setLoading(true);
     try {
       const amount = getTotal() * 1000; // Use actual total amount
-      const email = user?.email;
 
       if (!email) {
-        alert("You must be logged in to proceed with payment.");
+        alert(
+          "You must fill your email in the delivery form to proceed with payment."
+        );
         setLoading(false);
         return;
       }
 
       const link = await createPaymentLink(amount, email);
       setPaymentLink(link);
+      // Save delivery form data to localStorage
+      const formData = {
+        email,
+        cartItems,
+        totalAmount: amount,
+      };
+      localStorage.setItem("orderData", JSON.stringify(formData));
+
       window.location.href = link;
     } catch (error) {
       console.error("Error initializing payment:", error);
@@ -40,24 +50,39 @@ const MyCart = () => {
     }
   };
 
-  const handleVerifyPayment = async (reference) => {
-    try {
-      const result = await verifyPayment(reference);
-      console.log("Payment Verification Result:", result);
+  // This function will be passed to the DeliveryForm to update the form completion status
+  const handleFormCompletion = (completed, userEmail) => {
+    setIsFormComplete(completed);
+    if (completed) {
+      setEmail(userEmail); // Save the email when the form is complete
+    }
+  };
 
-      if (result.paymentData.status === "success") {
-        // Success feedback logic
-      } else {
-        // Failure feedback logic
-      }
-    } catch (error) {
-      console.error("Error verifying payment:", error);
+  // Button click handler that determines behavior based on form completion
+  const handleButtonClick = () => {
+    if (isFormComplete) {
+      handlePayment();
+    } else {
+      setIsVisible(true); // Open the delivery form if form isn't complete
     }
   };
 
   return (
-    <Fade triggerOnce duration={500}>
-      <div className="min-h-screen p-8 flex flex-col md:flex-row gap-8 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="relative">
+      <div
+        className={`${
+          isVisible
+            ? "transform translate-y-0 opacity-100"
+            : "transform translate-y-full opacity-0"
+        } fixed h-[90%] overflow-y-auto left-0 bottom-0 w-full bg-white/60 backdrop-blur-md rounded-t-xl shadow-lg transition-all duration-500`}
+        style={{ zIndex: 999 }}
+      >
+        <DeliveryForm
+          setIsVisible={setIsVisible}
+          onFormCompletion={handleFormCompletion} // Pass form completion handler
+        />
+      </div>
+      <div className="p-8 flex flex-col md:flex-row gap-8 bg-gradient-to-br from-gray-50 to-gray-100">
         {/* Cart Items */}
         <div className="flex-1 space-y-6">
           <Slide direction="left" duration={600}>
@@ -81,33 +106,35 @@ const MyCart = () => {
             </Fade>
           ) : (
             <Slide cascade damping={0.1} duration={300}>
-              {cartItems.map(({ id, title, image, price }) => (
-                <div
-                  key={id}
-                  className="group flex items-center gap-4 p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
-                >
-                  <img
-                    src={image}
-                    alt={title}
-                    className="w-24 h-24 object-cover rounded-lg border-2 border-gray-100"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg text-gray-800">
-                      {title}
-                    </h3>
-                    <div className="mt-2 text-gray-600">
-                      <p>₦{(price * 1000).toLocaleString()}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => removeFromCart(id)}
-                    className="text-red-400 hover:text-red-600 transition-colors p-2 rounded-full hover:bg-red-50"
-                    aria-label="Remove item"
+              <div>
+                {cartItems.map(({ id, title, image, price }) => (
+                  <div
+                    key={id}
+                    className="group flex items-center gap-4 p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
                   >
-                    <FaTimes size={20} />
-                  </button>
-                </div>
-              ))}
+                    <img
+                      src={image}
+                      alt={title}
+                      className="w-24 h-24 object-cover rounded-lg border-2 border-gray-100"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-gray-800">
+                        {title}
+                      </h3>
+                      <div className="mt-2 text-gray-600">
+                        <p>₦{(price * 1000).toLocaleString()}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => removeFromCart(id)}
+                      className="text-red-400 hover:text-red-600 transition-colors p-2 rounded-full hover:bg-red-50"
+                      aria-label="Remove item"
+                    >
+                      <FaTimes size={20} />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </Slide>
           )}
         </div>
@@ -118,6 +145,11 @@ const MyCart = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-6">
               Order Summary
             </h2>
+            {errorMessage && (
+              <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm font-medium">
+                {errorMessage}
+              </div>
+            )}
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal:</span>
@@ -133,22 +165,28 @@ const MyCart = () => {
                 <span>₦{(getTotal() * 1000).toLocaleString()}</span>
               </div>
             </div>
-
+            {/* Conditional button based on form completion */}
             <button
-              onClick={handlePayment}
-              disabled={loading}
+              onClick={handleButtonClick} // Use the unified button handler
+              disabled={loading || (isFormComplete && !cartItems.length)}
               className={`w-full mt-8 ${
-                loading ? "bg-gray-400" : "bg-[#eb9b40] hover:bg-[#d18a38]"
+                loading || !isFormComplete
+                  ? "bg-[#eb9b40]"
+                  : "bg-[#eb9b40] hover:bg-[#d18a38]"
               } text-white py-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2`}
             >
-              <FaLock className="text-sm" />
-              {loading ? "Redirecting..." : "Proceed to Checkout"}
+              <FaCartPlus className="text-sm" />
+              {loading
+                ? "Redirecting..."
+                : isFormComplete
+                ? "Proceed to Checkout"
+                : "Add Delivery Info"}
             </button>
           </div>
         </Slide>
       </div>
-    </Fade>
+    </div>
   );
 };
 
-export default MyCart;
+export default CartPage;

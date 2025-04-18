@@ -1,4 +1,5 @@
 import axios from "axios";
+import nodemailer from "nodemailer";
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
@@ -35,11 +36,7 @@ const createPaymentLink = async (req, res) => {
 };
 
 // Verify Payment
-const verifyPayment = async (req, res) => {
-  const { reference } = req.query;
-
-  console.log("Received reference:", reference);
-
+const verifyPayment = async (reference, email, orderDetails) => {
   try {
     const response = await axios.get(
       `https://api.paystack.co/transaction/verify/${reference}`,
@@ -51,34 +48,45 @@ const verifyPayment = async (req, res) => {
     );
 
     const paymentData = response.data.data;
-    console.log("Payment data from Paystack:", paymentData);
 
     if (paymentData.status !== "success") {
-      return res.status(400).json({
-        message: "Payment not successful",
-        paymentStatus: paymentData.status,
-      });
+      return "failed";
     }
 
-    const customerEmail = paymentData.customer?.email;
-    if (!customerEmail) {
-      console.error("No customer email found");
-      return res.status(400).json({ message: "Customer email missing" });
-    }
+    // Send confirmation email after successful payment
+    await sendOrderConfirmationEmail(email, orderDetails);
 
-    // Removed Supabase insert logic
-
-    return res
-      .status(200)
-      .json({ message: "Payment verified successfully", paymentData });
+    return "success"; // Payment verified and email sent successfully
   } catch (error) {
-    console.error(
-      "Unexpected error:",
-      error?.response?.data || error.message || error
-    );
-    return res
-      .status(500)
-      .json({ message: "Payment verification failed", error });
+    console.error("Error verifying payment:", error);
+    throw new Error("Payment verification failed");
+  }
+};
+
+// Function to send order confirmation email
+const sendOrderConfirmationEmail = async (email, orderDetails) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail", // Example: Using Gmail service
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "Order Confirmation",
+    text: `Thank you for your order! Here are your order details: ${JSON.stringify(
+      orderDetails
+    )}`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Confirmation email sent!");
+  } catch (error) {
+    console.error("Error sending confirmation email:", error);
   }
 };
 

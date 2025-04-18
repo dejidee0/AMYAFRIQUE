@@ -26,6 +26,36 @@ const PaymentSuccess = () => {
 
         if (res.ok && data.paymentData) {
           setStatus("Payment Verified Successfully!");
+
+          // Retrieve order data from local storage
+          const orderData = JSON.parse(localStorage.getItem("orderData"));
+
+          if (orderData) {
+            // Send order details to the business owner's email
+            const emailResponse = await fetch(
+              `${import.meta.env.VITE_BACKEND_URL}/api/send-order-email`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  ...orderData,
+                  subject: "New Order Confirmation",
+                  message: `Order from ${
+                    orderData.email
+                  }, details: ${JSON.stringify(orderData.cartItems)}`,
+                }),
+              }
+            );
+
+            if (emailResponse.ok) {
+              console.log("Order details sent to business owner.");
+            } else {
+              console.error("Failed to send order details.");
+            }
+          }
+
           clearCart();
           setTimeout(() => {
             navigate("/"); // Navigate to a thank-you page or home

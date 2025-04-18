@@ -1,6 +1,7 @@
 import { Link, NavLink } from "react-router-dom";
 import logo from "../../public/logo.png";
 import { useEffect, useState } from "react";
+import { FaUserCircle } from "react-icons/fa";
 
 import supabase from "../../supabase-client";
 
@@ -59,6 +60,9 @@ const Navbar = () => {
       <NavLink to={"/events"} className={"text-[#eb9b40] font-extrabold"}>
         Events
       </NavLink>
+      <NavLink to={"/myCart"} className={"text-[#eb9b40] font-extrabold"}>
+        My Cart
+      </NavLink>
       <NavLink to={"/aboutUs"} className={"text-[#eb9b40] font-extrabold"}>
         About Us
       </NavLink>
@@ -72,12 +76,6 @@ const Navbar = () => {
       {allowedEmails.includes(user?.email) && (
         <NavLink to={"/addCraft"} className={"text-[#eb9b40] font-extrabold"}>
           Add Art Item
-        </NavLink>
-      )}
-
-      {user && (
-        <NavLink to={"/myCart"} className={"text-[#eb9b40] font-extrabold"}>
-          My Cart
         </NavLink>
       )}
     </>
@@ -162,45 +160,30 @@ const Navbar = () => {
             </label>
           </div>
 
-          <div className="flex flex-col gap-3">
-            {user ? (
-              <div className="dropdown dropdown-end flex flex-row gap-3">
+          <div className="flex items-center gap-3">
+            <div className="dropdown dropdown-end">
+              <Link
+                to="/logged"
+                className="tooltip tooltip-bottom"
+                data-tip={user ? user.email : "Sign in / Register"}
+              >
                 <div
                   tabIndex={0}
-                  role=""
-                  className="btn btn-circle avatar tooltip tooltip-top lg:tooltip-top"
-                  data-tip={user?.email}
+                  role="button"
+                  className="btn btn-circle avatar"
                 >
-                  <div className="rounded-full">
-                    <img
-                      alt="User Avatar"
-                      src={
-                        user?.user_metadata?.avatar_url ||
-                        "https://via.placeholder.com/40"
-                      }
-                    />
-                  </div>
+                  <FaUserCircle className="text-[#eb9b40]" size={28} />
                 </div>
-                <button
-                  onClick={handleLogOut}
-                  className="btn bg-[#eb9b40] text-black"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-row gap-3">
-                <Link to={"/login"}>
-                  <button className="lg:btn md:btn lg:bg-[#eb9b40] md:bg-[#eb9b40] text-orange-500 font-bold p-1">
-                    Login
-                  </button>
-                </Link>
-                <Link to={"/register"}>
-                  <button className="lg:btn md:btn lg:bg-[#eb9b40] md:bg-[#eb9b40] text-orange-500 font-bold p-1">
-                    Register
-                  </button>
-                </Link>
-              </div>
+              </Link>
+            </div>
+
+            {user && (
+              <button
+                onClick={handleLogOut}
+                className="btn bg-[#eb9b40] text-black"
+              >
+                Logout
+              </button>
             )}
           </div>
         </div>

@@ -1,7 +1,6 @@
-// api/verify-payment.js (Node.js / Express / Next.js-compatible)
 import axios from "axios";
-import supabase from "../supabase-client.js";
 import dotenv from "dotenv";
+import { sendOrderConfirmationEmail } from "../mailer.js"; // Import the email sending function
 
 dotenv.config({ path: ".env.server" }); // Load PAYSTACK_SECRET_KEY
 
@@ -12,10 +11,12 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { reference } = req.query;
+  const { reference, email, orderDetails } = req.query; // Get email and orderDetails from query
 
-  if (!reference) {
-    return res.status(400).json({ error: "Reference is required" });
+  if (!reference || !email || !orderDetails) {
+    return res
+      .status(400)
+      .json({ error: "Missing reference, email, or order details" });
   }
 
   try {
@@ -34,25 +35,11 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Payment verification failed" });
     }
 
-    // ✅ Optional: update the existing row with final payment status
-    const { error: supabaseError } = await supabase
-      .from("payments")
-      .update({
-        status: "success",
-        paystack_reference: paymentData.reference,
-        verified_at: new Date(),
-      })
-      .eq("reference", reference);
-
-    if (supabaseError) {
-      console.error("Supabase update error:", supabaseError);
-      return res
-        .status(500)
-        .json({ error: "Payment verified, but DB update failed" });
-    }
+    // Send confirmation email after successful payment
+    await sendOrderConfirmationEmail(email, JSON.parse(orderDetails)); // Send order details as email content
 
     return res.status(200).json({
-      message: "Payment verified successfully",
+      message: "Payment verified successfully, email sent.",
       paymentData,
     });
   } catch (error) {

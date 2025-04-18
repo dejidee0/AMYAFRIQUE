@@ -5,7 +5,7 @@ import Root from "../page/Root";
 import AllArt from "../page/AllArt";
 import AddCraft from "../page/AddCraft";
 import MyCraft from "../page/MyCraft";
-import MyCart from "../page/MyCart";
+import CartPage from "../page/MyCart";
 import Login from "../page/Logged";
 import Register from "../page/Register";
 import PrivateRoute from "../private/PrivateRoute";
@@ -85,7 +85,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/myCart",
-        element: <MyCart></MyCart>,
+        element: <CartPage></CartPage>,
       },
       {
         path: "/test",

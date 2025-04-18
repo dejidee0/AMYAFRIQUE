@@ -21,31 +21,103 @@ const Login = () => {
     setErrors("");
     setSuccess("");
 
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    const email = e.target.email.value.trim();
+    const password = e.target.password.value.trim();
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setErrors(error.message);
+    if (!email || !password) {
       Swal.fire({
-        text: error.message,
-        icon: "error",
-        confirmButtonText: "Ok",
+        title: "Missing Details",
+        text: "Please fill in both email and password.",
+        icon: "warning",
+        confirmButtonText: "Okay",
       });
-    } else {
-      setSuccess("login in successfully");
-      Swal.fire({
-        text: "Successfully login in",
-        icon: "success",
-        confirmButtonText: "Ok",
-      });
-      navigate(location?.state || "/");
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        let friendlyMessage = "Something went wrong. Please try again.";
+
+        if (error.message.toLowerCase().includes("invalid login")) {
+          friendlyMessage = "Incorrect email or password.";
+        } else if (error.message.toLowerCase().includes("user not found")) {
+          friendlyMessage = "Account not found. Please check your email.";
+        } else if (
+          error.message.toLowerCase().includes("email not confirmed")
+        ) {
+          friendlyMessage =
+            "Your email hasn't been confirmed yet. Please check your inbox.";
+
+          Swal.fire({
+            title: "Email Not Confirmed",
+            text: "Please verify your email before logging in to complete the registration process.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Resend Confirmation",
+            cancelButtonText: "Cancel",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              const { error: resendError } = await supabase.auth.resend({
+                type: "signup",
+                email: email,
+              });
+
+              if (resendError) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Resend Failed",
+                  text: "We couldn't resend the email. Please try again later.",
+                });
+              } else {
+                Swal.fire({
+                  icon: "success",
+                  title: "Confirmation Sent",
+                  text: "A new confirmation email has been sent to your inbox.",
+                });
+              }
+            }
+          });
+        } else if (error.message.toLowerCase().includes("network")) {
+          friendlyMessage =
+            "Network error. Please check your internet connection.";
+        }
+
+        setErrors(friendlyMessage);
+
+        Swal.fire({
+          title: "Login Failed",
+          text: friendlyMessage,
+          icon: "error",
+          confirmButtonText: "Try Again",
+        });
+      } else {
+        setSuccess("Logged in successfully");
+
+        Swal.fire({
+          title: "Welcome!",
+          text: "You've successfully logged in.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
+        navigate(location?.state || "/");
+      }
+    } catch (err) {
+      Swal.fire({
+        title: "Unexpected Error",
+        text: "We encountered an unexpected error. Please try again later.",
+        icon: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -84,9 +156,23 @@ const Login = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
 
-          {errors && <p className="text-red-500 mt-2 text-center">{errors}</p>}
+          {errors && (
+            <p
+              className="text-red-500 mt-2 text-center"
+              role="alert"
+              aria-live="polite"
+            >
+              {errors}
+            </p>
+          )}
           {success && (
-            <p className="text-green-500 mt-2 text-center">{success}</p>
+            <p
+              className="text-green-500 mt-2 text-center"
+              role="alert"
+              aria-live="polite"
+            >
+              {success}
+            </p>
           )}
 
           <p className="mt-4 text-center text-sm">
