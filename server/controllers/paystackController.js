@@ -113,4 +113,4 @@ const sendOrderConfirmationEmail = async (email, orderDetails) => {
   }
 };
 
-export { createPaymentLink, verifyPayment };
+export { createPaymentLink, verifyPayment, sendOrderConfirmationEmail };

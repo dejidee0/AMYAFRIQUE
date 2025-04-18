@@ -67,7 +67,7 @@ const PaymentSuccess = () => {
           }
 
           clearCart();
-          setTimeout(() => navigate("/thank-you"), 2000);
+          setTimeout(() => navigate("/myCart"), 2000);
           setStatus("Payment Verified Successfully!");
         }
       } catch (err) {
