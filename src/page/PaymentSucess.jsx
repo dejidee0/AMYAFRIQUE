@@ -1,89 +1,78 @@
 // pages/payment-success.jsx
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom"; // React Router v6 hooks
+import { useLocation, useNavigate } from "react-router-dom";
 import { useCartStore } from "../store/cartStore";
 
 const PaymentSuccess = () => {
-  const location = useLocation(); // For accessing URL query params
-  const navigate = useNavigate(); // For navigating after payment success
+  const location = useLocation();
+  const navigate = useNavigate();
   const [status, setStatus] = useState("Verifying...");
   const clearCart = useCartStore((state) => state.clearCart);
-  // Extracting the reference from the URL query params
   const reference = new URLSearchParams(location.search).get("reference");
 
   useEffect(() => {
     const verify = async () => {
-      if (!reference) return;
+      if (!reference) {
+        setStatus("Missing payment reference");
+        return;
+      }
 
       try {
-        // Retrieve order data from local storage
         const orderData = JSON.parse(localStorage.getItem("orderData"));
         if (!orderData) {
           setStatus("Order data not found.");
           return;
         }
 
-        const { email, cartItems } = orderData;
-        const orderDetails = cartItems; // No need to stringify here, as we will send it in the body
+        // Construct query parameters
+        const queryParams = new URLSearchParams({
+          reference,
+          email: orderData.email,
+          orderDetails: encodeURIComponent(JSON.stringify(orderData.cartItems)),
+        }).toString();
 
-        // Verify payment using POST
+        // Use GET request with query parameters
         const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/verify-payment`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              reference,
-              email,
-              orderDetails,
-            }),
-          }
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/verify-payment?${queryParams}`
         );
 
-        if (res.ok) {
-          const data = await res.json();
+        if (!res.ok) {
+          setStatus("Payment verification failed");
+          return;
+        }
 
-          if (data.message === "Payment verified successfully, email sent.") {
-            // Send order details to the business owner's email
-            const emailResponse = await fetch(
+        const data = await res.json();
+
+        if (data.message === "Payment verified successfully, email sent.") {
+          // Send order confirmation to business owner
+          try {
+            await fetch(
               `${import.meta.env.VITE_BACKEND_URL}/api/send-order-email`,
               {
                 method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  ...orderData,
+                  email: orderData.email,
                   subject: "New Order Confirmation",
-                  message: `Order from ${
-                    orderData.email
-                  }, details: ${JSON.stringify(orderData.cartItems)}`,
+                  message: `Order from ${orderData.email}: ${JSON.stringify(
+                    orderData.cartItems
+                  )}`,
                 }),
               }
             );
-
-            if (emailResponse.ok) {
-              console.log("Order details sent to business owner.");
-            } else {
-              console.error("Failed to send order details.");
-            }
-
-            // Clear cart and navigate
-            clearCart();
-            setTimeout(() => {
-              navigate("/thank-you"); // Navigate to a thank-you page or home
-            }, 2000);
-          } else {
-            setStatus("Payment verification failed.");
+          } catch (emailError) {
+            console.error("Email sending failed:", emailError);
           }
-        } else {
-          setStatus("Payment verification failed.");
+
+          clearCart();
+          setTimeout(() => navigate("/thank-you"), 2000);
+          setStatus("Payment Verified Successfully!");
         }
       } catch (err) {
-        console.error("Error verifying payment:", err);
-        setStatus("Something went wrong during verification.");
+        console.error("Verification error:", err);
+        setStatus("Payment verification failed");
       }
     };
 
