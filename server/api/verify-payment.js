@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   }
 
   const { reference, email, orderDetails } = req.query; // Get email and orderDetails from query
-
+  console.log(reference);
   if (!reference || !email || !orderDetails) {
     return res
       .status(400)

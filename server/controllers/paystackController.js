@@ -34,8 +34,14 @@ const createPaymentLink = async (req, res) => {
 };
 
 // Verify Payment
+// Verify Payment
 const verifyPayment = async (req, res) => {
-  const { reference, email, orderDetails } = req.query;
+  let { reference, email, orderDetails } = req.query;
+
+  // ✅ Ensure values are strings
+  reference = reference?.toString();
+  email = email?.toString();
+  orderDetails = orderDetails?.toString();
 
   if (!reference || !email || !orderDetails) {
     return res
