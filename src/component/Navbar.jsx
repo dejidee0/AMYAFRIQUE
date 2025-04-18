@@ -163,7 +163,7 @@ const Navbar = () => {
           <div className="flex items-center gap-3">
             <div className="dropdown dropdown-end">
               <Link
-                to="/logged"
+                to="/login"
                 className="tooltip tooltip-bottom"
                 data-tip={user ? user.email : "Sign in / Register"}
               >
