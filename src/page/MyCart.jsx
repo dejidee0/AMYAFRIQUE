@@ -18,6 +18,14 @@ const CartPage = () => {
 
   const errorMessage = ""; // Replace with error handling logic
 
+  const handleFormCompletion = (completed, userEmail) => {
+    setIsFormComplete(completed);
+    if (completed) {
+      setEmail(userEmail); // Save the email when the form is complete
+    }
+  };
+
+  console.log(email);
   const handlePayment = async () => {
     setLoading(true);
     try {
@@ -51,12 +59,6 @@ const CartPage = () => {
   };
 
   // This function will be passed to the DeliveryForm to update the form completion status
-  const handleFormCompletion = (completed, userEmail) => {
-    setIsFormComplete(completed);
-    if (completed) {
-      setEmail(userEmail); // Save the email when the form is complete
-    }
-  };
 
   // Button click handler that determines behavior based on form completion
   const handleButtonClick = () => {

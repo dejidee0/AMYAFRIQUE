@@ -1,8 +1,6 @@
 import axios from "axios";
 import nodemailer from "nodemailer";
 
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
-
 // Create Payment Link
 const createPaymentLink = async (req, res) => {
   const { amount, email } = req.body;
@@ -12,14 +10,14 @@ const createPaymentLink = async (req, res) => {
       "https://api.paystack.co/transaction/initialize",
       {
         email,
-        amount: amount * 100, // convert to Kobo
+        amount: amount * 100,
         callback_url: `${
           req.headers.origin || "http://localhost:3000"
-        }/checkout-success`, // Adjust callback if needed
+        }/checkout-success`,
       },
       {
         headers: {
-          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
           "Content-Type": "application/json",
         },
       }
@@ -36,13 +34,21 @@ const createPaymentLink = async (req, res) => {
 };
 
 // Verify Payment
-const verifyPayment = async (reference, email, orderDetails) => {
+const verifyPayment = async (req, res) => {
+  const { reference, email, orderDetails } = req.query;
+
+  if (!reference || !email || !orderDetails) {
+    return res
+      .status(400)
+      .json({ error: "Missing reference, email, or order details" });
+  }
+
   try {
     const response = await axios.get(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
         headers: {
-          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
         },
       }
     );
@@ -50,23 +56,28 @@ const verifyPayment = async (reference, email, orderDetails) => {
     const paymentData = response.data.data;
 
     if (paymentData.status !== "success") {
-      return "failed";
+      return res.status(400).json({ error: "Payment verification failed" });
     }
 
-    // Send confirmation email after successful payment
-    await sendOrderConfirmationEmail(email, orderDetails);
+    await sendOrderConfirmationEmail(email, JSON.parse(orderDetails));
 
-    return "success"; // Payment verified and email sent successfully
+    return res.status(200).json({
+      message: "Payment verified successfully, email sent.",
+      paymentData,
+    });
   } catch (error) {
-    console.error("Error verifying payment:", error);
-    throw new Error("Payment verification failed");
+    console.error(
+      "Verification error:",
+      error?.response?.data || error.message
+    );
+    return res.status(500).json({ error: "Payment verification failed" });
   }
 };
 
-// Function to send order confirmation email
+// Email Sender
 const sendOrderConfirmationEmail = async (email, orderDetails) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail", // Example: Using Gmail service
+    service: "gmail",
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
@@ -78,7 +89,9 @@ const sendOrderConfirmationEmail = async (email, orderDetails) => {
     to: email,
     subject: "Order Confirmation",
     text: `Thank you for your order! Here are your order details: ${JSON.stringify(
-      orderDetails
+      orderDetails,
+      null,
+      2
     )}`,
   };
 

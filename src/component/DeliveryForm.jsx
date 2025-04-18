@@ -56,7 +56,7 @@ const DeliveryForm = ({ setIsVisible, onFormCompletion }) => {
     }
 
     toast.success("Delivery information submitted successfully!");
-    onFormCompletion(true); // Notify parent that the form is complete
+    onFormCompletion(true, formData.email); // Notify parent that the form is complete
     setIsVisible(false); // Close the form
   };
 
