@@ -7,12 +7,12 @@ dotenv.config({ path: ".env.server" }); // Load PAYSTACK_SECRET_KEY
 const { PAYSTACK_SECRET_KEY } = process.env;
 
 export default async function handler(req, res) {
-  if (req.method !== "GET") {
+  if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { reference, email, orderDetails } = req.query; // Get email and orderDetails from query
-  console.log(reference);
+  const { reference, email, orderDetails } = req.body;
+
   if (!reference || !email || !orderDetails) {
     return res
       .status(400)
@@ -29,14 +29,13 @@ export default async function handler(req, res) {
       }
     );
 
-    const paymentData = response.data.data;
+    const paymentData = response.data?.data;
 
-    if (paymentData.status !== "success") {
+    if (!paymentData || paymentData.status !== "success") {
       return res.status(400).json({ error: "Payment verification failed" });
     }
 
-    // Send confirmation email after successful payment
-    await sendOrderConfirmationEmail(email, JSON.parse(orderDetails)); // Send order details as email content
+    await sendOrderConfirmationEmail(email, orderDetails);
 
     return res.status(200).json({
       message: "Payment verified successfully, email sent.",
