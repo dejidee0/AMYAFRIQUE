@@ -32,7 +32,7 @@ const Footer = () => {
             alt="AmyAfrique Logo"
           />
         </Flip>
-        <h2 className="font-bold text-3xl text-white">Amarachi Okpara</h2>
+        <h2 className="font-bold text-3xl text-white">Amara Okpara</h2>
         <p className="text-black font-semibold mt-6">
           Copyright © 2024 - All rights reserved by amyafrique.net
         </p>
