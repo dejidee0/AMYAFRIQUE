@@ -33,7 +33,7 @@ const coreValues = [
 
 export default function MissionVisionValues() {
   return (
-    <section className="px-4 py-16 text-gray-800 dark:text-white">
+    <section className="px-4 py-16 text-base-content">
       <div className="max-w-6xl mx-auto space-y-20">
         {/* Mission Section */}
         <Fade direction="up" cascade damping={0.1} triggerOnce>
@@ -70,8 +70,8 @@ export default function MissionVisionValues() {
 
         {/* Vision Section */}
         <Slide direction="left" triggerOnce>
-          <div className="space-y-6 bg-gray-100 dark:bg-gray-800 p-8 rounded-xl shadow-md">
-            <h2 className="text-3xl font-bold border-l-4 border-[#eb9b40] pl-4">
+          <div className="space-y-6 bg-base-content p-8 rounded-xl shadow-md">
+            <h2 className="text-3xl font-bold border-l-4 border-[#eb9b40] pl-4 text-base-content">
               Our Vision
             </h2>
             <p className="text-lg leading-relaxed">
@@ -95,13 +95,11 @@ export default function MissionVisionValues() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {coreValues.map((value, idx) => (
               <Slide key={idx} direction="up" delay={idx * 100} triggerOnce>
-                <div className="bg-white dark:bg-gray-700 rounded-lg p-6 shadow-md hover:shadow-xl transition duration-300">
+                <div className="bg-white  rounded-lg p-6 shadow-md hover:shadow-xl transition duration-300">
                   <h3 className="text-xl font-semibold mb-2 text-[#eb9b40]">
                     {value.title}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {value.desc}
-                  </p>
+                  <p className="text-sm text-base-content">{value.desc}</p>
                 </div>
               </Slide>
             ))}

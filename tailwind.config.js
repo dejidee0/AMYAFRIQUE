@@ -6,6 +6,22 @@ export default {
       fontFamily: {
         greatvibes: ["Great Vibes", "cursive"],
       },
+      daisyui: {
+        themes: [
+          {
+            light: {
+              ...require("daisyui/src/theming/themes")["light"],
+              primary: "#eb9b40", // Your orange color
+              "primary-content": "#ffffff", // Text color on primary
+            },
+            dark: {
+              ...require("daisyui/src/theming/themes")["dark"],
+              primary: "#d88a36", // Slightly darker orange
+              "primary-content": "#ffffff",
+            },
+          },
+        ],
+      },
       animation: {
         fadeIn: "fadeIn 0.5s ease-in-out",
         "pulse-ring": "pulse-ring 1s ease-out infinite",

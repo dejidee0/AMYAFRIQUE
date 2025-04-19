@@ -1,12 +1,23 @@
 import { Link, NavLink } from "react-router-dom";
 import logo from "../../public/logo.png";
 import { useEffect, useState } from "react";
-import { FaUserCircle } from "react-icons/fa";
+import { FaCartPlus, FaUserCircle } from "react-icons/fa";
 
 import supabase from "../../supabase-client";
 
 const Navbar = () => {
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  const handleTheme = (e) => {
+    const newTheme = e.target.checked ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+  };
+
   const [user, setUser] = useState(null); // Set to null initially
   const allowedEmails = [
     "amyafriquee@gmail.com",
@@ -34,16 +45,6 @@ const Navbar = () => {
     return () => authListener.subscription.unsubscribe();
   }, []);
 
-  const handleTheme = (e) => {
-    if (e.target.checked) {
-      setTheme("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      setTheme("light");
-      localStorage.setItem("theme", "light");
-    }
-  };
-
   const handleLogOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -60,9 +61,7 @@ const Navbar = () => {
       <NavLink to={"/events"} className={"text-[#eb9b40] font-extrabold"}>
         Events
       </NavLink>
-      <NavLink to={"/myCart"} className={"text-[#eb9b40] font-extrabold"}>
-        My Cart
-      </NavLink>
+
       <NavLink to={"/aboutUs"} className={"text-[#eb9b40] font-extrabold"}>
         About Us
       </NavLink>
@@ -143,7 +142,9 @@ const Navbar = () => {
                 onChange={handleTheme}
                 type="checkbox"
                 className="toggle theme-controller"
+                checked={theme === "dark"}
               />
+
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -161,6 +162,10 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link to="/myCart">
+              <FaCartPlus size={25} />
+            </Link>
+
             <div className="dropdown dropdown-end">
               <Link
                 to="/login"

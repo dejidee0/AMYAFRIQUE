@@ -43,7 +43,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen text-gray-900">
+    <div className="relative min-h-screen bg-base-100 text-base-content">
       {/* Loading Spinner */}
       {isLoading && (
         <div className="flex justify-center items-center h-screen">
@@ -133,8 +133,8 @@ const ArtShowcase = ({ image, title, description }) => (
         className="w-80 h-80 object-cover rounded-lg shadow-xl transition-transform hover:scale-105"
       />
       <div className="max-w-2xl text-center lg:text-left">
-        <h3 className="text-2xl font-semibold text-white">{title}</h3>
-        <p className="mt-4 text-gray-200">{description}</p>
+        <h3 className="text-2xl font-semibold text-base-content">{title}</h3>
+        <p className="mt-4 text-base-content">{description}</p>
       </div>
     </div>
   </Fade>

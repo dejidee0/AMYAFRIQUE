@@ -34,7 +34,7 @@ const About = () => {
 
           <hr className="mt-4 pl-7 border-2 border-[#eb9b40] w-1/2 mx-auto sm:mx-0" />
           <Fade delay={300}>
-            <p className="text-gray-200 mt-6 text-base sm:text-base leading-relaxed ">
+            <p className="text-base-content mt-6 text-base sm:text-base leading-relaxed ">
               <span className="text-[#eb9b40] text-2xl sm:text-3xl">
                 Okpara Judith Amarachi{" "}
               </span>
@@ -55,7 +55,7 @@ const About = () => {
 
             {/* Read More Section */}
             {showFullText && (
-              <p className="text-gray-200 mt-4 text-base sm:text-base leading-relaxed font-greatvibes">
+              <p className="text-base-content mt-4 text-base sm:text-base leading-relaxed font-greatvibes">
                 {/* Full text continues here... */}
                 designing and painting on outfits, a project they named
                 “Bankara.” In 2020, while taking a walk in her estate, Amarachi
@@ -101,7 +101,7 @@ const About = () => {
 
             <div className="mb-8 flex-1">
               <Slide direction="left" delay={600}>
-                <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-gray-200">
+                <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-base-content">
                   Education
                 </h3>
               </Slide>
@@ -126,7 +126,7 @@ const About = () => {
             
             <div className="flex-1">
               <Slide direction="right" delay={600}>
-                <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-gray-200">
+                <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-base-content">
                   Awards & Recognition
                 </h3>
               </Slide>

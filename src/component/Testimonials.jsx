@@ -29,7 +29,7 @@ export default function TestimonialsSection() {
   return (
     <section className="border-[#eb9b40] border-2 px-4 py-16 text-gray-800 dark:text-white">
       <div className="max-w-6xl mx-auto space-y-10">
-        <h2 className="text-3xl font-bold text-center mb-10">
+        <h2 className="text-3xl font-bold text-center mb-10 text-base-content">
           What People Are Saying
         </h2>
         <hr className="mt-4 border-2 border-[#eb9b40] w-1/2 mx-auto " />
