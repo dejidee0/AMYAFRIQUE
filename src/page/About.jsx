@@ -12,10 +12,10 @@ const About = () => {
 
   return (
     <>
-      <div className="h-auto sm:h-auto flex flex-col lg:flex-row justify-around items-center relative px-4 py-8 md:py-2 overflow-hidden ">
+      <div className="h-auto sm:h-auto flex flex-col sm:gap-10 lg:flex-row justify-around items-center relative px-4 py-8 md:py-2 overflow-hidden ">
         {/* Image Section */}
         <Fade delay={200}>
-          <div className="h-[350px] sm:h-[530px] w-full sm:w-auto object-cover mb-6 sm:mb-0 rounded-xl shadow-xl">
+          <div className="h-[350px] sm:h-[530px] w-full sm:min-w-[420px] object-cover mb-6 sm:mb-0 rounded-xl shadow-xl">
             <img
               src="/image3.jpg"
               alt="Artist"
@@ -27,14 +27,14 @@ const About = () => {
         {/* Text Content Section */}
         <div className="text-center sm:text-left max-w-3xl px-6 sm:px-0 md:py-8">
           <Slide direction="left" delay={200}>
-            <h1 className="text-[#eb9b40] font-bold text-3xl sm:text-4xl mb-6 font-greatvibes sm:py-3">
+            <h1 className="text-[#eb9b40] font-bold text-3xl sm:text-4xl mb-6  sm:py-3">
               The Gallerist behind the Artistry
             </h1>
           </Slide>
 
           <hr className="mt-4 pl-7 border-2 border-[#eb9b40] w-1/2 mx-auto sm:mx-0" />
           <Fade delay={300}>
-            <p className="text-gray-200 mt-6 text-base sm:text-base leading-relaxed font-greatvibes">
+            <p className="text-gray-200 mt-6 text-base sm:text-base leading-relaxed ">
               <span className="text-[#eb9b40] text-2xl sm:text-3xl">
                 Okpara Judith Amarachi{" "}
               </span>
