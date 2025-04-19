@@ -1,20 +1,15 @@
-import { Flip } from "react-awesome-reveal";
+import { Bounce, Flip } from "react-awesome-reveal";
 import { FaFacebook, FaGithub, FaTwitter } from "react-icons/fa6";
 import logo from "../../public/logo.png";
+import { FaInstagram } from "react-icons/fa";
+import BouncingSocialIcons from "./Icons";
 
 const Footer = () => {
   return (
     <footer className="footer p-10 border-2 border-white rounded-3xl bg-gradient-to-r from-[#eb9b40] to-[#eb9b40] text-neutral-content">
       <nav>
         <h1 className="text-white font-bold text-xl">Social</h1>
-        <Flip>
-          <div className="flex flex-row justify-center items-center gap-3">
-            <FaFacebook className="text-white text-3xl" />
-            <FaGithub className="text-white text-3xl" />
-            <FaTwitter className="text-white text-3xl" />
-          </div>
-        </Flip>
-
+        <BouncingSocialIcons />
         <p className="font-semibold text-xl text-white">
           For more information send us email at
         </p>
