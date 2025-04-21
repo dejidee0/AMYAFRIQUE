@@ -61,6 +61,9 @@ const Navbar = () => {
       <NavLink to={"/events"} className={"text-[#eb9b40] font-extrabold"}>
         Events
       </NavLink>
+      <NavLink to={"/myCart"} className={"text-[#eb9b40] font-extrabold"}>
+        My Cart
+      </NavLink>
 
       <NavLink to={"/aboutUs"} className={"text-[#eb9b40] font-extrabold"}>
         About Us
@@ -122,7 +125,7 @@ const Navbar = () => {
         </div>
 
         <div className="navbar-end">
-          <div className="lg:mr-4 lg:block hidden md:block">
+          <div className="lg:mr-4 ">
             <label className="flex cursor-pointer gap-2 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -162,10 +165,6 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link to="/myCart">
-              <FaCartPlus size={25} />
-            </Link>
-
             <div className="dropdown dropdown-end">
               <Link
                 to="/login"

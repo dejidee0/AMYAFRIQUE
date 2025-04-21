@@ -55,7 +55,7 @@ const About = () => {
 
             {/* Read More Section */}
             {showFullText && (
-              <p className="text-base-content mt-4 text-base sm:text-base leading-relaxed font-greatvibes">
+              <p className="text-base-content mt-4 text-base sm:text-base leading-relaxed ">
                 {/* Full text continues here... */}
                 designing and painting on outfits, a project they named
                 “Bankara.” In 2020, while taking a walk in her estate, Amarachi
