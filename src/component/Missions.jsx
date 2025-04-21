@@ -70,7 +70,7 @@ export default function MissionVisionValues() {
 
         {/* Vision Section */}
         <Slide direction="left" triggerOnce>
-          <div className="space-y-6 bg-base-content p-8 rounded-xl shadow-md">
+          <div className="space-y-6  p-8 rounded-xl shadow-md">
             <h2 className="text-3xl font-bold border-l-4 border-[#eb9b40] pl-4 text-base-content">
               Our Vision
             </h2>
