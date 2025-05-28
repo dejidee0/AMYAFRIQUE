@@ -6,14 +6,14 @@ import { FaCartPlus, FaUserCircle } from "react-icons/fa";
 import supabase from "../../supabase-client";
 
 const Navbar = () => {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   const handleTheme = (e) => {
-    const newTheme = e.target.checked ? "dark" : "light";
+    const newTheme = e.target.checked ? "dark" : "dark";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
   };
