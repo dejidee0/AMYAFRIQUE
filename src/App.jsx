@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import useAuthStore from "./store/authStore";
 import { RouterProvider } from "react-router-dom";
 import router from "./router/routes";
+import VideoBackground from './components/VideoBackground'; // adjust the path
+
 
 const App = () => {
   const fetchUser = useAuthStore((state) => state.fetchUser);
